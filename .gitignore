@@ -1,0 +1,5 @@
+# OS realted files
+*.DS_Store
+
+# IDE generated files
+.idea
