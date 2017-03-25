@@ -1,16 +1,18 @@
-;(function ($, undefined) {
-  'use strict';
+'use strict';
 
+(function ($) {
   var pluginName = 'collapsible',
     dataKey = 'plugin_' + pluginName,
+    // eslint-disable-next-line func-style
     Plugin = function (element, options) {
-      this.element = element;
-      this.parents = ['trigger', 'wrap', 'content'];
-      this.attributes = ['open', 'indicatorParent', 'trigger', 'content'];
-      this.defaults = {
-        trigger:         undefined,
+      var that = this;
+
+      that.element = element;
+      that.parents = ['trigger', 'wrap', 'content'];
+      // define the attributes that will be used to override options (defaults)
+      that.attributes = ['open', 'indicatorParent', 'trigger', 'content'];
+      that.defaults = {
         triggerClass:    'trigger',
-        content:         undefined,
         contentClass:    'content',
         open:            false,
         classPrefix:     'collapsible-',
@@ -20,21 +22,21 @@
         indicatorParent: false,
         openText:        'Show details',
         closeText:       'Hide details',
-        calcDelta:       function () {
+        calcDelta() {
           return 0;
         },
         activeToggle:    false
       };
-      this.init(options);
+      that._init(options);
     },
     $win = $(window);
 
 
   Plugin.prototype = {
     // check if content is visible
-    checkViewport: function () {
-      var self = this,
-        settings = self.settings,
+    checkViewport() {
+      var that = this,
+        settings = that.settings,
         off,
         delta;
 
@@ -42,44 +44,46 @@
         return false;
       }
 
-      off = self.$wrap.offset().top;
+      off = that.$wrap.offset().top;
       delta = settings.calcDelta();
 
       if ($win.scrollTop() > off) {
         $win.scrollTop(off - delta);
       }
+
+      return true;
     },
 
 
     // set trigger listener
-    setListener: function () {
-      var self = this;
+    setListener() {
+      var that = this;
 
-      self.settings.$trigger.on('click.collapsible', function (e) {
+      that.settings.$trigger.on('click.collapsible', function (e) {
         e.preventDefault();
-        self.toggle();
-        self.checkViewport();
+        that.toggle();
+        that.checkViewport();
       });
     },
 
 
     // remove listener
-    unsetListener: function () {
+    unsetListener() {
       this.settings.$trigger.off('click.collapsible');
     },
 
 
     // check if the given option is valid
-    checkIndicatorParent: function () {
-      var self = this,
-        s = self.settings;
+    checkIndicatorParent() {
+      var that = this,
+        s = that.settings;
 
       if (!s.indicatorParent) {
         return false;
       }
 
-      for (var i = 0, len = self.parents.length; i < len; i += 1) {
-        if (self.parents[i] === s.indicatorParent) {
+      for (var i = 0, len = that.parents.length; i < len; i += 1) {
+        if (that.parents[i] === s.indicatorParent) {
           return true;
         }
       }
@@ -89,12 +93,12 @@
 
 
     // create an additional element to show the status
-    createIndicator: function () {
-      var self = this,
-        s = self.settings,
+    createIndicator() {
+      var that = this,
+        s = that.settings,
         $appendTo;
 
-      if (!self.checkIndicatorParent()) {
+      if (!that.checkIndicatorParent()) {
         return false;
       }
 
@@ -103,7 +107,7 @@
 
       switch (s.indicatorParent) {
         case 'parent':
-          $appendTo = self.$wrap;
+          $appendTo = that.$wrap;
           break;
         case 'trigger':
           $appendTo = s.$trigger;
@@ -118,10 +122,10 @@
 
 
     // create
-    create: function () {
-      var self = this,
-        s = self.settings,
-        $wrap = self.$wrap;
+    create() {
+      var that = this,
+        s = that.settings,
+        $wrap = that.$wrap;
 
       $wrap.trigger('before-create');
 
@@ -132,16 +136,16 @@
       s.$trigger.addClass(s.classPrefix + s.triggerClass);
       s.$content.addClass(s.classPrefix + s.contentClass);
 
-      self.createIndicator();
-      self.setListener();
+      that.createIndicator();
+      that.setListener();
       $wrap.trigger('create');
     },
 
 
     // toggle the indicator text
-    toggleIndicator: function (status) {
-      var self = this,
-        s = self.settings,
+    toggleIndicator(status) {
+      var that = this,
+        s = that.settings,
         text = (status) ? s.openText : s.closeText;
 
       if (!s.$indicator) {
@@ -154,116 +158,118 @@
 
 
     // toggle the display and set related data
-    toggle: function (status) {
-      var self = this,
-        s = self.settings;
+    toggle(status) {
+      var that = this,
+        s = that.settings;
 
       // true = open; false = closed
       if (status !== true && status !== false) {
         status = !s.open;
       }
 
-      self.$wrap.trigger('toggle-before', [s.open]);
+      that.$wrap.trigger('toggle-before', [s.open]);
 
-      self.$wrap.toggleClass(s.classPrefix + s.openClass, status)
+      that.$wrap.toggleClass(s.classPrefix + s.openClass, status)
         .toggleClass(s.classPrefix + s.closeClass, !status);
-      self.toggleIndicator(status);
+      that.toggleIndicator(status);
 
       if (s.activeToggle) {
         s.$content.toggle(status);
       }
 
       s.open = status;
-      self.$wrap.trigger('toggle', [status]);
-      return true;
+      that.$wrap.trigger('toggle', [status]);
+
+      return status;
     },
 
 
     // update
-    update: function (status) {
-      var self = this;
+    update(status) {
+      var that = this;
 
-      self.$wrap.trigger('before-update');
-      self.toggle(status);
-      self.$wrap.trigger('update');
+      that.$wrap.trigger('before-update');
+      that.toggle(status);
+      that.$wrap.trigger('update');
     },
 
 
     // use settings passed to the element using the "data-" attribute
-    importAttrConfig: function () {
-      var self = this,
-        s = self.settings,
-        data = self.$wrap.data('options'),
-        attr;
+    _importAttrConfig() {
+      this._log('importAttrConfig');
+
+      var that = this,
+        s = that.settings,
+        data = that.$wrap.data('options');
 
       if (!data) {
         return false;
       }
 
-      for (var i = 0, len = self.attributes.length; i < len; i += 1) {
-        attr = self.attributes[i];
-        if (data.hasOwnProperty(attr)) {
+      for (const attr of that.attributes) {
+        if (Reflect.getOwnPropertyDescriptor(data, attr)) {
           s[attr] = data[attr];
         }
       }
+
+      return that.settings;
     },
 
 
-    // init
-    init: function (options) {
-      var self = this;
+    // (private) where it all begins
+    _init(options) {
+      var that = this;
 
-      self.$wrap = $(self.element);
+      that.$wrap = $(that.element);
 
-      self.settings = $.extend(self.defaults, options);
-      self.importAttrConfig();
+      that.settings = $.extend(that.defaults, options);
+      that._importAttrConfig();
 
-      self.create();
-      self.update(self.settings.open);
+      that.create();
+      that.update(that.settings.open);
 
-      self.$wrap.trigger('init', [status]);
+      that.$wrap.trigger('init', [status]);
     },
 
 
     // destroy
-    destroy: function () {
-      var self = this,
-        s = self.settings;
+    destroy() {
+      var that = this,
+        s = that.settings;
 
-      self.$wrap.trigger('before-destroy', [status]);
+      that.$wrap.trigger('before-destroy', [status]);
       if (s.$indicator) {
         s.$indicator.remove();
       }
-      self.toggle(true); // force show
-      self.unsetListener();
-      self.$wrap.trigger('destroy', [status]);
+      // force show
+      that.toggle(true);
+      that.unsetListener();
+      that.$wrap.trigger('destroy', [status]);
     },
 
 
     //
-    getStatus: function () {
+    getStatus() {
       return this.settings.open;
     }
   };
 
 
   // Plugin wrapper
-  $.fn[pluginName] = function (options) {
+  $.fn[pluginName] = function (options, additionaloptions) {
     return this.each(function () {
-      var $this = $(this),
-        plugin = $this.data(dataKey);
+      // eslint-disable-next-line no-invalid-this
+      var that = this;
 
-      // has plugin instantiated ?
-      if (plugin instanceof Plugin) {
-        // if have options arguments, call plugin.init() again
-        if (typeof options !== 'undefined') {
-          plugin.init(options);
-        }
+      if (!$.data(that, dataKey)) {
+        $.data(that, dataKey, new Plugin(that, options));
       }
-      else {
-        plugin = new Plugin(this, options);
-        $this.data(dataKey, plugin);
+      else if (Plugin.prototype[options]) {
+        // prevent execution of private functions
+        if (typeof options === 'string' && options.substr(0, 1) !== '_') {
+          $.data(that, dataKey)[options](additionaloptions);
+        }
       }
     });
   };
-})(jQuery);
+}(jQuery));

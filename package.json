@@ -1,0 +1,21 @@
+{
+  "name": "jquery-plugins",
+  "title": "re-usabel plugins and behaviors",
+  "description": "A package of re-usable custom plugins and drupal behaviors.",
+  "version": "1.0.0",
+  "dependencies": {},
+  "devDependencies": {
+    "browser-sync": "^2.11.2",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^3.0.1",
+    "gulp-modernizr": "^1.0.0-alpha",
+    "modernizr": "^3.3.1"
+  },
+  "engines": {
+    "node": ">=0.12.0"
+  },
+  "scripts": {
+    "postinstall": "bower install",
+    "test": "gulp test"
+  }
+}

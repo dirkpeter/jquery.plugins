@@ -1,0 +1,7 @@
+{
+  "name": "jquery plugins and drupal behaviors",
+  "version": "1.0.0",
+  "dependencies": {
+    "jquery": "^3.1.1"
+  }
+}

@@ -8,17 +8,18 @@
       var that = this;
 
       that.element = element;
+      // define the attributes that will be used to override options (defaults)
       that.attributes = ['abc', 'xyz'];
       that.defaults = {
         debug: false
       };
-      that.init(options);
+      that._init(options);
     };
 
 
   Plugin.prototype = {
-    //
-    log(txt) {
+    // (private) logging for development
+    _log(txt) {
       if (this.settings.debug === true) {
         // eslint-disable-next-line no-console
         console.log('[' + pluginName + ']', txt);
@@ -26,20 +27,21 @@
     },
 
 
-    //
+    // update the plugin
     update() {
-      this.log('update');
+      this._log('update');
 
       var that = this;
+
       that.$element.trigger('before-update');
 
       that.$element.trigger('update');
     },
 
 
-    //
-    create() {
-      this.log('create');
+    // (private) create markup or other requirements
+    _create() {
+      this._log('create');
 
       var that = this;
 
@@ -47,10 +49,10 @@
     },
 
 
-    // use settings passed to the element using the "data-" attribute
+    // (private) use settings passed to the element using the "data-" attribute
     // settings will supply the used attributes
-    importAttrConfig() {
-      this.log('importAttrConfig');
+    _importAttrConfig() {
+      this._log('importAttrConfig');
 
       var that = this,
         s = that.settings,
@@ -70,16 +72,16 @@
     },
 
 
-    //
-    init(options) {
+    // (private) where the fun begins
+    _init(options) {
       var that = this;
 
       that.$element = $(that.element);
 
       that.settings = $.extend(that.defaults, options);
-      that.importAttrConfig();
+      that._importAttrConfig();
 
-      that.create();
+      that._create();
       that.update();
 
       that.$element.trigger('init');
@@ -98,7 +100,7 @@
       }
       else if (Plugin.prototype[options]) {
         // prevent execution of private functions
-        if (typeof options === 'string') {
+        if (typeof options === 'string' && options.substr(0, 1) !== '_') {
           $.data(that, dataKey)[options](additionaloptions);
         }
       }
