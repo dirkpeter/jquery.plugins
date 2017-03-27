@@ -8,11 +8,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <script src="/lib/modernizr.custom.js"></script>
+
+  <style>
+    body {
+      box-sizing: border-box;
+      max-width: 300px;
+      margin: 2em auto;
+    }
+
+    .collapsible {
+      border: 1px solid #ccc;
+    }
+
+    .collapsible h3 {
+      margin: 0;
+    }
+
+    .collapsible .tgr,
+    .collapsible .cnt {
+      padding: 5px;
+    }
+
+    .collapsible .tgr {
+      display: block;
+      background-color: #ccc;
+      text-decoration: none;
+      color: #000;
+    }
+
+    .collapsible .cnt > :first-child {
+      margin-top: 0;
+    }
+
+    .collapsible .cnt > :last-child {
+      margin-bottom: 0;
+    }
+
+    .collapsible.collapsible-close .cnt {
+      display: none;
+    }
+  </style>
 </head>
 
 <body>
-  <!-- Add your site or application content here -->
-  <p>Hello world! This is HTML5 Boilerplate.</p>
+  <div class="collapsible">
+    <a href="#" title="Toggle content" class="tgr">
+      <h3>Toggle content</h3>
+    </a>
+
+    <div class="cnt">
+      <p>Donec sed odio dui. Nulla vitae elit libero, a pharetra augue. Curabitur blandit tempus porttitor. Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</p>
+    </div>
+  </div>
 
   <script src="/lib/jquery/dist/jquery.min.js"></script>
   <script src="jquery.collapsible.js"></script>
@@ -21,7 +68,15 @@
   <script language="JavaScript">
     (function ($) {
       $(function () {
-        //
+        $('.collapsible').collapsible({
+          debug: true,
+          trigger: '.tgr',
+          content: '.cnt'
+        });
+
+        $('.collapsible').on('toggle', function (e, status) {
+          console.info('toggle', status);
+        });
       });
     } (jQuery));
   </script>

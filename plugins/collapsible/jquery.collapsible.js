@@ -12,6 +12,11 @@
       // define the attributes that will be used to override options (defaults)
       that.attributes = ['open', 'indicatorParent', 'trigger', 'content'];
       that.defaults = {
+        debug:           false,
+        trigger:         '.trigger',
+        content:         '.content',
+        $trigger:        $(),
+        $content:        $(),
         triggerClass:    'trigger',
         contentClass:    'content',
         open:            false,
@@ -33,8 +38,27 @@
 
 
   Plugin.prototype = {
+    // (private) logging for development
+    _log(txt, ...args) {
+      var name = '[' + pluginName + ' :: ' + txt + ']';
+
+      if (this.settings.debug === true) {
+        if (args.length) {
+          // eslint-disable-next-line no-console
+          console.log(name, args);
+        }
+        else {
+          // eslint-disable-next-line no-console
+          console.log(name);
+        }
+      }
+    },
+
+
     // check if content is visible
-    checkViewport() {
+    _checkViewport() {
+      this._log('_checkViewport');
+
       var that = this,
         settings = that.settings,
         off,
@@ -49,6 +73,7 @@
 
       if ($win.scrollTop() > off) {
         $win.scrollTop(off - delta);
+        that.$wrap.trigger('adjust-viewport', [settings.open]);
       }
 
       return true;
@@ -56,25 +81,31 @@
 
 
     // set trigger listener
-    setListener() {
+    _setListener() {
+      this._log('_setListener');
+
       var that = this;
 
       that.settings.$trigger.on('click.collapsible', function (e) {
+        that._log('trigger click', e);
         e.preventDefault();
         that.toggle();
-        that.checkViewport();
+        that._checkViewport();
       });
     },
 
 
     // remove listener
-    unsetListener() {
+    _unsetListener() {
+      this._log('_unsetListener');
       this.settings.$trigger.off('click.collapsible');
     },
 
 
     // check if the given option is valid
-    checkIndicatorParent() {
+    _checkIndicatorParent() {
+      this._log('_checkIndicatorParent');
+
       var that = this,
         s = that.settings;
 
@@ -93,12 +124,14 @@
 
 
     // create an additional element to show the status
-    createIndicator() {
+    _createIndicator() {
+      this._log('_createIndicator');
+
       var that = this,
         s = that.settings,
         $appendTo;
 
-      if (!that.checkIndicatorParent()) {
+      if (!that._checkIndicatorParent()) {
         return false;
       }
 
@@ -106,47 +139,81 @@
         .addClass(s.classPrefix + s.indicatorClass);
 
       switch (s.indicatorParent) {
-        case 'parent':
-          $appendTo = that.$wrap;
-          break;
         case 'trigger':
           $appendTo = s.$trigger;
           break;
         case 'content':
           $appendTo = s.$content;
           break;
+        case 'parent':
+        default:
+          $appendTo = that.$wrap;
+          break;
       }
 
       s.$indicator.appendTo($appendTo);
+
+      return true;
     },
 
 
-    // create
-    create() {
+    //
+    _getJqueryElements () {
+      this._log('_getJqueryElements');
+
       var that = this,
         s = that.settings,
         $wrap = that.$wrap;
 
-      $wrap.trigger('before-create');
-
       // make sure we're working with jquery objects
-      s.$trigger = (typeof s.trigger === 'object') ? s.trigger : $wrap.find(s.trigger);
-      s.$content = (typeof s.content === 'object') ? s.content : $wrap.find(s.content);
+      if (typeof s.trigger === 'object') {
+        s.$trigger = s.trigger;
+      }
+      else {
+        s.$trigger = $wrap.find(s.trigger);
+      }
+
+      if (typeof s.content === 'object') {
+        s.$content = s.content;
+      }
+      else {
+        s.$content = $wrap.find(s.content);
+      }
+    },
+
+
+    // (private) create
+    _create() {
+      this._log('_create');
+
+      var that = this,
+        s = that.settings,
+        $wrap = that.$wrap;
+
+      $wrap.trigger('before-create', [that.settings.open]);
+
+      that._getJqueryElements();
 
       s.$trigger.addClass(s.classPrefix + s.triggerClass);
       s.$content.addClass(s.classPrefix + s.contentClass);
 
-      that.createIndicator();
-      that.setListener();
-      $wrap.trigger('create');
+      that._createIndicator();
+      that._setListener();
+      $wrap.trigger('create', [that.settings.open]);
     },
 
 
     // toggle the indicator text
-    toggleIndicator(status) {
+    _toggleIndicator(status) {
+      this._log('_toggleIndicator');
+
       var that = this,
         s = that.settings,
-        text = (status) ? s.openText : s.closeText;
+        text = s.closeText;
+
+      if (status) {
+        text = s.openText;
+      }
 
       if (!s.$indicator) {
         return false;
@@ -154,31 +221,45 @@
 
       s.$indicator.text(text)
         .attr('title', text);
+
+      return status;
+    },
+
+
+    //
+    _toggleByStatus(status) {
+      this._log('_toggleStausClass');
+      var that = this,
+        s = that.settings;
+
+      that.$wrap.toggleClass(s.classPrefix + s.openClass, status)
+        .toggleClass(s.classPrefix + s.closeClass, !status);
+      that._toggleIndicator(status);
+
+      if (s.activeToggle) {
+        s.$content.toggle(status);
+      }
     },
 
 
     // toggle the display and set related data
-    toggle(status) {
+    toggle(setStatus) {
+      this._log('toggle');
       var that = this,
-        s = that.settings;
+        s = that.settings,
+        status = setStatus;
 
       // true = open; false = closed
       if (status !== true && status !== false) {
         status = !s.open;
       }
 
-      that.$wrap.trigger('toggle-before', [s.open]);
+      this._log('<status>', status);
 
-      that.$wrap.toggleClass(s.classPrefix + s.openClass, status)
-        .toggleClass(s.classPrefix + s.closeClass, !status);
-      that.toggleIndicator(status);
-
-      if (s.activeToggle) {
-        s.$content.toggle(status);
-      }
-
+      that.$wrap.trigger('before-toggle', [s.open, status]);
+      that._toggleByStatus(status);
       s.open = status;
-      that.$wrap.trigger('toggle', [status]);
+      that.$wrap.trigger('toggle', [s.open]);
 
       return status;
     },
@@ -188,15 +269,18 @@
     update(status) {
       var that = this;
 
-      that.$wrap.trigger('before-update');
+      that._log('update');
+      that.$wrap.trigger('before-update', [that.settings.open]);
       that.toggle(status);
-      that.$wrap.trigger('update');
+      that.$wrap.trigger('update', [that.settings.open]);
+
+      return status;
     },
 
 
     // use settings passed to the element using the "data-" attribute
     _importAttrConfig() {
-      this._log('importAttrConfig');
+      this._log('_importAttrConfig');
 
       var that = this,
         s = that.settings,
@@ -223,17 +307,20 @@
       that.$wrap = $(that.element);
 
       that.settings = $.extend(that.defaults, options);
+      that._log('_init');
       that._importAttrConfig();
 
-      that.create();
+      that._create();
       that.update(that.settings.open);
 
-      that.$wrap.trigger('init', [status]);
+      that.$wrap.trigger('init', [that.settings.status]);
     },
 
 
     // destroy
     destroy() {
+      this._log('destroy');
+
       var that = this,
         s = that.settings;
 
@@ -243,13 +330,15 @@
       }
       // force show
       that.toggle(true);
-      that.unsetListener();
+      that._unsetListener();
       that.$wrap.trigger('destroy', [status]);
     },
 
 
     //
     getStatus() {
+      this._log('getStatus');
+
       return this.settings.open;
     }
   };

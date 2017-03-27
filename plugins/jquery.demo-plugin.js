@@ -19,10 +19,10 @@
 
   Plugin.prototype = {
     // (private) logging for development
-    _log(txt) {
+    _log(txt, ...args) {
       if (this.settings.debug === true) {
         // eslint-disable-next-line no-console
-        console.log('[' + pluginName + ']', txt);
+        console.log('[' + pluginName + ':' + txt + ']', args);
       }
     },
 

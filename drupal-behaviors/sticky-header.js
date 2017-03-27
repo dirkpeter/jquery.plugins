@@ -1,6 +1,6 @@
 // sticky header
 Drupal.behaviors.__THEME__StickyHeader = {
-  attach: function () {
+  attach () {
     var $header = $('.site-header--main--bottom'),
       stickyClass = 'is-fixed',
       eventPostfix = '.sticky-header',

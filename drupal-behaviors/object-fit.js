@@ -1,7 +1,8 @@
+// eslint-disable strict
 // object fit
 // Modernizr support required
 Drupal.behaviors.__THEME__ObjectFit = {
-  attach: function () {
+  attach () {
     if (!Modernizr.objectfit) {
       $('picture').once('object-fit')
         .each(function () {
