@@ -16,6 +16,7 @@ var config = {
   js: {
     src: [
       "plugins/**/*.js",
+      "!plugins/**/*.min.js",
       "drupal-behaviors/**/*.js"
     ]
   }
