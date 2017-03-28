@@ -7,8 +7,11 @@
   "devDependencies": {
     "browser-sync": "^2.11.2",
     "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
     "gulp-eslint": "^3.0.1",
     "gulp-modernizr": "^1.0.0-alpha",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^2.1.2",
     "modernizr": "^3.3.1"
   },
   "engines": {
