@@ -1,11 +1,11 @@
-/* globals YT */
-;(function ($, window, undefined) {
-  'use strict';
+'use strict';
 
+;(function ($, window) {
   var win = window,
     $win = $(window),
     pluginName = 'ytPlayer',
     dataKey = 'plugin_' + pluginName,
+    // eslint-disable-next-line func-style
     Plugin = function (element, options) {
       this.element = element;
       this.$el = $(this.element);
@@ -34,8 +34,8 @@
 
     // init player
     initPlayer: function () {
-      var self = this,
-        s = self.settings,
+      var that = this,
+        s = that.settings,
         options;
 
       if (!s.videoID) {
@@ -61,47 +61,47 @@
         options.width = s.width;
       }
 
-      self.player = new YT.Player(s.elementID, options);
+      that.player = new YT.Player(s.elementID, options);
     },
 
 
     // set an element id if not given
     setElementID: function () {
-      var self = this,
-        $el = self.$el;
+      var that = this,
+        $el = that.$el;
 
       if (!$el.attr('id')) {
-        $el.attr('id', self.autoIdPrefix + ($('[id|="' + self.autoIdPrefix + '"]').length + 1));
+        $el.attr('id', that.autoIdPrefix + ($('[id|="' + that.autoIdPrefix + '"]').length + 1));
       }
 
-      self.settings.elementID = $el.attr('id');
+      that.settings.elementID = $el.attr('id');
     },
 
 
     // create
     create: function () {
-      var self = this;
+      var that = this;
 
-      self.$el.trigger('before-create');
-      self.setElementID();
-      self.$el.trigger('create');
+      that.$el.trigger('before-create');
+      that.setElementID();
+      that.$el.trigger('create');
     },
 
 
     // update
     update: function () {
-      var self = this;
+      var that = this;
 
-      self.$el.trigger('before-update');
-      self.$el.trigger('update');
+      that.$el.trigger('before-update');
+      that.$el.trigger('update');
     },
 
 
     // use settings passed to the element using the "data-" attribute
     importAttrConfig: function () {
-      var self = this,
-        s = self.settings,
-        $el = self.$el,
+      var that = this,
+        s = that.settings,
+        $el = that.$el,
         opts = $el.data('options'),
         config = $el.data('playerConfig'),
         videoId = $el.data('videoId');
@@ -120,17 +120,17 @@
 
     // init
     init: function (options) {
-      var self = this;
+      var that = this;
 
-      self.settings = $.extend(self.defaults, options);
-      self.importAttrConfig();
-      self.create();
+      that.settings = $.extend(that.defaults, options);
+      that.importAttrConfig();
+      that.create();
 
       // when the script is loaded
       $win.on('yt-ready', function () {
-        self.initPlayer();
-        self.update();
-        self.$el.trigger('init', [status]);
+        that.initPlayer();
+        that.update();
+        that.$el.trigger('init', [status]);
       });
     }
   };

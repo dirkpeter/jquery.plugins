@@ -15,6 +15,7 @@
         debug:           false,
         trigger:         '.trigger',
         content:         '.content',
+        eventSuffix:     '.' + pluginName + '-plugin',
         $trigger:        $(),
         $content:        $(),
         triggerClass:    'trigger',
@@ -38,20 +39,34 @@
 
 
   Plugin.prototype = {
-    // (private) logging for development
-    _log(txt, ...args) {
-      var name = '[' + pluginName + ' :: ' + txt + ']';
+    // grouped loggin
+    _toggleLogging(toggle, suffix = '', ...args) {
+      /* eslint-disable no-console */
+      var s = this.settings;
 
-      if (this.settings.debug === true) {
-        if (args.length) {
-          // eslint-disable-next-line no-console
-          console.log(name, args);
+      if (s.debug) {
+        if (toggle) {
+          console.group([pluginName, suffix].join(' '), args);
         }
         else {
-          // eslint-disable-next-line no-console
-          console.log(name);
+          console.groupEnd();
         }
       }
+      /* eslint-enable no-console */
+    },
+
+    // (private) logging for development
+    _log(txt, ...args) {
+      /* eslint-disable no-console */
+      if (this.settings.debug) {
+        if (args.length) {
+          console.log(txt, args);
+        }
+        else {
+          console.log(txt);
+        }
+      }
+      /* eslint-enable no-console */
     },
 
 
@@ -82,15 +97,17 @@
 
     // set trigger listener
     _setListener() {
-      this._log('_setListener');
+      var that = this,
+        s = that.settings;
 
-      var that = this;
+      that._log('_setListener');
 
-      that.settings.$trigger.on('click.collapsible', function (e) {
-        that._log('trigger click', e);
+      s.$trigger.on('click' + s.eventSuffix, function (e) {
+        that._toggleLogging(true, '<trigger-click>', e);
         e.preventDefault();
         that.toggle();
         that._checkViewport();
+        that._toggleLogging();
       });
     },
 
@@ -98,7 +115,10 @@
     // remove listener
     _unsetListener() {
       this._log('_unsetListener');
-      this.settings.$trigger.off('click.collapsible');
+
+      var s = this.settings;
+
+      s.$trigger.off('click' + s.eventSuffix);
     },
 
 
@@ -145,7 +165,7 @@
         case 'content':
           $appendTo = s.$content;
           break;
-        case 'parent':
+        // case 'parent':
         default:
           $appendTo = that.$wrap;
           break;
@@ -205,7 +225,7 @@
 
     // toggle the indicator text
     _toggleIndicator(status) {
-      this._log('_toggleIndicator');
+      this._log('_toggleIndicator', status);
 
       var that = this,
         s = that.settings,
@@ -228,7 +248,7 @@
 
     //
     _toggleByStatus(status) {
-      this._log('_toggleStausClass');
+      this._log('_toggleStausClass', status);
       var that = this,
         s = that.settings;
 
@@ -243,23 +263,27 @@
 
 
     // toggle the display and set related data
-    toggle(setStatus) {
-      this._log('toggle');
+    toggle(setStatus, doNotEmitEvent) {
+      this._log('toggle', setStatus, doNotEmitEvent);
       var that = this,
         s = that.settings,
         status = setStatus;
 
       // true = open; false = closed
-      if (status !== true && status !== false) {
+      if (typeof setStatus !== 'boolean') {
         status = !s.open;
       }
 
-      this._log('<status>', status);
+      if (!doNotEmitEvent) {
+        that.$wrap.trigger('before-toggle', [s.open, status]);
+      }
 
-      that.$wrap.trigger('before-toggle', [s.open, status]);
       that._toggleByStatus(status);
       s.open = status;
-      that.$wrap.trigger('toggle', [s.open]);
+
+      if (!doNotEmitEvent) {
+        that.$wrap.trigger('toggle', [s.open]);
+      }
 
       return status;
     },
@@ -269,7 +293,7 @@
     update(status) {
       var that = this;
 
-      that._log('update');
+      that._log('update', status);
       that.$wrap.trigger('before-update', [that.settings.open]);
       that.toggle(status);
       that.$wrap.trigger('update', [that.settings.open]);
@@ -307,13 +331,15 @@
       that.$wrap = $(that.element);
 
       that.settings = $.extend(that.defaults, options);
-      that._log('_init');
+      that._toggleLogging(true);
+      that._log('_init', options);
       that._importAttrConfig();
 
       that._create();
       that.update(that.settings.open);
 
       that.$wrap.trigger('init', [that.settings.status]);
+      that._toggleLogging();
     },
 
 

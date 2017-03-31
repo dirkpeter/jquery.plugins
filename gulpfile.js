@@ -87,7 +87,20 @@ gulp.task('default', ['modernizr', 'test', 'uglify'], function () {
     notify: false
   });
 
-  gulp.watch(config.js.src, ['modernizr', 'lint', 'uglify']);
+  // gulp.watch(config.js.src, ['modernizr', 'lint', 'uglify']);
+  // temp
+  gulp.watch(config.js.src, ['modernizr'])
+    .on('change', function (e) {
+      gulp.src(e.path)
+        .pipe(eslint({
+          globals: [
+            'Drupal',
+            'Modernizr',
+            'jQuery'
+          ]
+        }))
+        .pipe(eslint.format('stylish'));
+    });
 
   gulp.watch([config.js.src, '**/*.html'])
     .on('change', browserSync.reload);

@@ -61,6 +61,9 @@
     </div>
   </div>
 
+  <button id="open">open</button>
+  <button id="close">close</button>
+
   <script src="/lib/jquery/dist/jquery.min.js"></script>
   <script src="jquery.collapsible.js"></script>
 
@@ -68,14 +71,26 @@
   <script language="JavaScript">
     (function ($) {
       $(function () {
-        $('.collapsible').collapsible({
+        var $c = $('.collapsible');
+
+        // init
+        $c.collapsible({
           debug: true,
           trigger: '.tgr',
           content: '.cnt'
         });
 
-        $('.collapsible').on('toggle', function (e, status) {
+        // event-listener example
+        $c.on('toggle', function (e, status) {
           console.info('toggle', status);
+        });
+
+        $('#open').click(function () {
+          $c.collapsible('toggle', true);
+        });
+
+        $('#close').click(function () {
+          $c.collapsible('toggle', false);
         });
       });
     } (jQuery));

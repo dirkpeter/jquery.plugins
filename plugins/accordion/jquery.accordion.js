@@ -1,203 +1,262 @@
-;(function ($, undefined) {
-  'use strict';
+'use strict';
 
+(function ($) {
   var pluginName = 'accordion',
     dataKey = 'plugin_' + pluginName,
+    // eslint-disable-next-line func-style
     Plugin = function (element, options) {
       this.element = element;
       this.attributes = ['current', 'trigger', 'content'];
       this.defaults = {
-        classPrefix:    'accordion-',
-        elements:       undefined,
-        elementsClass:  'element',
-        trigger:        undefined,
-        triggerClass:   'trigger',
-        content:        undefined,
-        contentClass:   'content',
-        toggleListener: true,
-        multiple:       false,
-        calcDelta:      function () {
+        debug:             false,
+        debugCollapsibles: false,
+        elements:          $(),
+        classPrefix:       'accordion-',
+        eventSuffix:       '.' + pluginName + '-plugin',
+        elementsClass:     'element',
+        trigger:           '.trigger',
+        content:           '.content',
+        triggerClass:      'trigger',
+        contentClass:      'content',
+        toggleListener:    true,
+        multiple:          false,
+        calcDelta() {
           return 0;
         },
-        current:        0
+        current:           0
       };
-      this.init(options);
+      this._init(options);
     };
 
 
   Plugin.prototype = {
-    // close all but the current
-    setCurrent: function (index, showCurrent, forceCurrent) {
-      var self = this,
-        s = self.settings,
-        elements = s.elementsCache,
-        i, len;
+    // grouped loggin
+    _toggleLogging(toggle, suffix = '', ...args) {
+      /* eslint-disable no-console */
+      var s = this.settings;
 
-      forceCurrent = forceCurrent || false;
-      if (index === undefined || (!forceCurrent && s.current === index)) {
+      if (s.debug) {
+        if (toggle) {
+          console.group([pluginName, suffix].join(' '), args);
+        }
+        else {
+          console.groupEnd();
+        }
+      }
+      /* eslint-enable no-console */
+    },
+
+
+    // (private) logging for development
+    _log(txt, ...args) {
+      /* eslint-disable no-console */
+      if (this.settings.debug === true) {
+        if (args.length) {
+          console.log(txt, args);
+        }
+        else {
+          console.log(txt);
+        }
+      }
+      /* eslint-enable no-console */
+    },
+
+
+    // (private) close all but the current
+    _setCurrent(index, showCurrent, forceCurrent) {
+      this._log('_setCurrent', index, showCurrent, forceCurrent);
+
+      var that = this,
+        s = that.settings,
+        elements = s.elementsCache;
+
+      // eslint-disable-next-line no-extra-parens
+      if (parseInt(index, 10) < 0 || (!forceCurrent && s.current === index)) {
         return false;
       }
 
       // show the new current
-      if (showCurrent || showCurrent === undefined) {
-        elements[index].toggle(true);
+      if (showCurrent || typeof showCurrent !== 'boolean') {
+        elements[index].toggle(true, true);
       }
 
       if (s.multiple !== true) {
         // hide all others
-        for (i = 0, len = elements.length; i < len; i += 1) {
+        elements.forEach((element, i) => {
           if (i !== index) {
-            elements[i].toggle(false);
+            element.toggle(false, true);
           }
-        }
+        });
       }
 
       s.current = index;
+      that.$wrap.trigger('set-current', [index]);
+
+      return index;
     },
 
 
-    // listen to the collapsibles
-    setCollapsibleListener: function () {
-      var self = this;
+    // (private) listen to the collapsibles
+    _setCollapsibleListener() {
+      this._log('_setCollapsibleListener');
 
-      self.$elements.on({
-        toggle: function (e, isOpen) {
-          if (isOpen) {
-            self.setCurrent($(this).index(), false);
-          }
+      var that = this;
+
+      that.$elements.on('toggle' + that.settings.eventSuffix, (e, isOpen) => {
+        that._toggleLogging(true, '<element-toggle>', e, isOpen);
+        if (isOpen) {
+          that.goto($(e.currentTarget).index(), true, false);
         }
+        that._toggleLogging();
       });
     },
 
 
-    // cache the elements to have faster access by id, and not have to cast them each time
-    cacheElementsById: function () {
-      var self = this,
+    // (private) cache the elements to have faster access by id, and not have to cast them each time
+    _cacheElementsById() {
+      this._log('_cacheElementsById');
+
+      var that = this,
         cache = [];
 
-      self.$elements.each(function (i, el) {
+      that.$elements.each(function (i, el) {
         cache.push($(el).data('plugin_collapsible'));
       });
 
-      self.settings.elementsCache = cache;
+      that.settings.elementsCache = cache;
     },
 
 
-    // create
-    create: function () {
-      var self = this,
-        s = self.settings;
+    // (private) create
+    _create() {
+      this._log('_create');
+
+      var that = this,
+        s = that.settings;
 
       // init the collapsibles
-      self.$elements.collapsible({
+      that.$elements.collapsible({
         trigger:   s.trigger,
         content:   s.content,
         calcDelta: s.calcDelta,
-        open:      false
+        open:      false,
+        debug:     s.debugCollapsibles
       });
-      self.cacheElementsById();
-      self.elementCount = s.elementsCache.length;
+      that._cacheElementsById();
+      that.elementCount = s.elementsCache.length;
 
       if (s.toggleListener) {
-        self.setCollapsibleListener();
+        that._setCollapsibleListener();
       }
     },
 
 
     // set the current step
-    goto: function (stepnumber, isIndex) {
-      var self = this,
+    goto(stepnumber, isIndex) {
+      this._log('goto', stepnumber, isIndex);
+
+      var that = this,
         index = stepnumber;
-      isIndex = isIndex || false;
 
       if (!isIndex) {
         index = parseInt(stepnumber, 10) - 1;
       }
 
-      if (index < 0 || index >= self.elementCount) {
+      if (index < 0 || index >= that.elementCount) {
+        that._log('index exceeds range (' + index + '/' + that.elementCount + ')');
+
         return false;
       }
 
-      self.setCurrent(index, true, true);
+      that._setCurrent(index, true, true);
+
+      return index;
     },
 
 
     // update
-    update: function () {
-      var self = this;
+    update() {
+      this._log('update');
 
-      self.goto(self.settings.current, true);
+      var that = this;
+
+      that.goto(that.settings.current, true);
     },
 
 
-    // use settings passed to the element using the "data-" attribute
-    importAttrConfig: function () {
-      var self = this,
-        s = self.settings,
-        data = self.$wrap.data('options'),
-        attr;
+    // (private) use settings passed to the element using the "data-" attribute
+    _importAttrConfig() {
+      this._log('_importAttrConfig');
+
+      var that = this,
+        s = that.settings,
+        data = that.$wrap.data('options');
 
       if (!data) {
         return false;
       }
 
-      for (var i = 0, len = self.attributes.length; i < len; i += 1) {
-        attr = self.attributes[i];
-        if (data.hasOwnProperty(attr)) {
+      for (const attr of that.attributes) {
+        if (Reflect.getOwnPropertyDescriptor(data, attr)) {
           s[attr] = data[attr];
         }
       }
+
+      return that.settings;
     },
 
 
-    // init
-    init: function (options) {
-      var self = this,
-        $wrap = self.$wrap = $(self.element);
+    // (private) init
+    _init(options) {
+      var that = this;
 
-      self.settings = $.extend(self.defaults, options);
-      self.importAttrConfig();
+      that.$wrap = $(that.element);
 
-      // get jq-objects
-      self.$elements = $wrap.find(self.settings.elements);
+      that.settings = $.extend(that.defaults, options);
+      that._toggleLogging(true);
+      that._log('_init', options);
+      that._importAttrConfig();
 
-      self.create();
-      self.update();
+      that.$elements = that.$wrap.find(that.settings.elements);
+      that._create();
+      that.update();
 
-      self.$wrap.trigger('init', [status]);
+      that.$wrap.trigger('init', [that.settings.status]);
+      that._toggleLogging();
     },
 
 
     // destroy
-    destroy: function () {
-      //
+    destroy () {
+      this._log('destroy');
+      // @todo
     },
 
 
     //
-    getCurrent: function () {
+    getCurrent () {
+      this._log('getCurrent');
+
       return this.settings.current;
     }
   };
 
 
   // Plugin wrapper
-  $.fn[pluginName] = function (options) {
+  $.fn[pluginName] = function (options, additionaloptions) {
     return this.each(function () {
-      var $this = $(this),
-        plugin = $this.data(dataKey);
+      // eslint-disable-next-line no-invalid-this
+      var that = this;
 
-      // has plugin instantiated ?
-      if (plugin instanceof Plugin) {
-        // if have options arguments, call plugin.init() again
-        if (typeof options !== 'undefined') {
-          plugin.init(options);
-        }
+      if (!$.data(that, dataKey)) {
+        $.data(that, dataKey, new Plugin(that, options));
       }
-      else {
-        plugin = new Plugin(this, options);
-        $this.data(dataKey, plugin);
+      else if (Plugin.prototype[options]) {
+        // prevent execution of private functions
+        if (typeof options === 'string' && options.substr(0, 1) !== '_') {
+          $.data(that, dataKey)[options](additionaloptions);
+        }
       }
     });
   };
-})(jQuery);
+}(jQuery));

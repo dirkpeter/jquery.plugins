@@ -1,0 +1,155 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>jquery.accordion.js</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script src="/lib/modernizr.custom.js"></script>
+
+  <style>
+    body {
+      box-sizing: border-box;
+      max-width: 300px;
+      margin: 2em auto;
+    }
+
+    .actions {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin: 1em 0;
+      justify-content: center;
+    }
+
+    .acc {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .collapsible {
+      border: 1px solid #ccc;
+    }
+
+    .collapsible:nth-child(n+2) {
+      margin-top: 5px;
+    }
+
+    .collapsible h3 {
+      margin: 0;
+    }
+
+    .collapsible .toggle,
+    .collapsible .body {
+      display: block;
+      padding: 5px;
+    }
+
+    .collapsible .body {
+      display: block;
+      background-color: #ccc;
+      text-decoration: none;
+      color: #000;
+    }
+
+    .collapsible .body > :first-child {
+      margin-top: 0;
+    }
+
+    .collapsible .body > :last-child {
+      margin-bottom: 0;
+    }
+
+    .collapsible.collapsible-close .body {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+<ul class="acc">
+  <li class="collapsible">
+    <a href="#" title="Toggle content" class="toggle">
+      <h3>Toggle content</h3>
+    </a>
+
+    <div class="body">
+      <p>Donec sed odio dui. Nulla vitae elit libero, a pharetra augue. Curabitur blandit tempus porttitor. Praesent
+         commodo cursus magna, vel scelerisque nisl consectetur et.</p>
+    </div>
+  </li>
+
+  <li class="collapsible">
+    <a href="#" title="Toggle content" class="toggle">
+      <h3>Sem Cursus Dolor Mollis</h3>
+    </a>
+
+    <div class="body">
+      <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris
+         condimentum nibh, ut fermentum massa justo sit amet risus. Maecenas faucibus mollis interdum. Sed posuere
+         consectetur est at lobortis.</p>
+    </div>
+  </li>
+
+  <li class="collapsible">
+    <a href="#" title="Toggle content" class="toggle">
+      <h3>Quam Magna Fusce</h3>
+    </a>
+
+    <div class="body">
+      <p>Aenean lacinia bibendum nulla sed consectetur. Fusce dapibus, tellus ac cursus commodo, tortor mauris
+         condimentum nibh, ut fermentum massa justo sit amet risus. Donec ullamcorper nulla non metus auctor
+         fringilla.</p>
+    </div>
+  </li>
+</ul>
+
+<ul class="actions">
+  <li>
+    <button data-child="1">Step 1</button>
+  </li>
+  <li>
+    <button data-child="2">Step 2</button>
+  </li>
+  <li>
+    <button data-child="3">Step 3</button>
+  </li>
+</ul>
+
+<input type="text" value="" id="current" />
+
+<script src="/lib/jquery/dist/jquery.min.js"></script>
+<script src="../collapsible/jquery.collapsible.js"></script>
+<script src="jquery.accordion.js"></script>
+
+<!-- custom js -->
+<script language="JavaScript">
+  (function ($) {
+    $(function () {
+      var $acc = $('.acc'),
+          $curr = $('#current');
+
+      $acc.accordion({
+        debug:             true,
+        debugCollapsibles: false,
+        trigger:           '.toggle',
+        content:           '.body',
+        elements:          '.collapsible'
+      });
+
+      $('button').on('click', function () {
+        $acc.accordion('goto', $(this).data('child'));
+      });
+
+      $acc.on('set-current', function (e, current) {
+        $curr.val(current);
+        console.info(e.type, current);
+      })
+    });
+  }(jQuery));
+</script>
+</body>
+</html>
