@@ -72,4 +72,4 @@ $('.foo').collapsible('toggle'[, false]);
 
 
 ## TODOs {#todos}
-- finish documentation
+- update (changes from accordion adjustment) & finish documentation

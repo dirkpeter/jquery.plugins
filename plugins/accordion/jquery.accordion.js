@@ -90,7 +90,7 @@
       }
 
       s.current = index;
-      that.$wrap.trigger('set-current', [index]);
+      that.$wrap.trigger('set-current', [that.settings.current]);
 
       return index;
     },
@@ -221,7 +221,7 @@
       that._create();
       that.update();
 
-      that.$wrap.trigger('init', [that.settings.status]);
+      that.$wrap.trigger('init', [that.settings.current]);
       that._toggleLogging();
     },
 
