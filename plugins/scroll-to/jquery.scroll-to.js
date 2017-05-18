@@ -1,9 +1,10 @@
 'use strict';
+
 (function ($, window) {
   $.fn.scrollTo = function (options) {
-    var $htmlbody = $('html, body'),
+    var $htmlBody = $('html, body'),
       settings = {
-        offset:   -60,
+        offset:   0,
         speed:    'slow',
         override: null
       };
@@ -14,25 +15,26 @@
 
     return this.each(function (i, el) {
       $(el).on('click.scroll', function (e) {
-        var idToLookAt;
+        var idToLookAt = $(el).attr('href');
 
+        // eslint-disable-next-line newline-per-chained-call
         if ($(el).attr('href').match(/#/) !== null) {
           e.preventDefault();
-          idToLookAt = (settings.override) ? settings.override : $(el).attr('href');
-          //see if the user is forcing an ID they want to use
-          //if the browser supports it, we push the hash into the pushState for better linking later
+          if (settings.override) {
+            idToLookAt = settings.override;
+          }
 
           if (history.pushState) {
             history.pushState(null, null, idToLookAt);
-            $htmlbody.stop()
+            $htmlBody.stop()
               .animate({scrollTop: $(idToLookAt).offset().top + settings.offset}, settings.speed);
           }
           else {
             // if the browser doesn't support pushState, we set the hash after the animation, which may cause issues
             // if you use offset
-            $htmlbody.stop()
+            $htmlBody.stop()
               .animate({scrollTop: $(idToLookAt).offset().top + settings.offset}, settings.speed, function () {
-                //set the hash of the window for better linking
+                // set the hash of the window for better linking
                 window.location.hash = idToLookAt;
               });
           }
