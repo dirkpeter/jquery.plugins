@@ -1,11 +1,12 @@
 'use strict';
 
+// eslint-disable-next-line max-statements
 (function ($) {
-  var pluginName = 'collapsible',
+  const pluginName = 'collapsible',
     dataKey = 'plugin_' + pluginName,
     // eslint-disable-next-line func-style
     Plugin = function (element, options) {
-      var that = this;
+      const that = this;
 
       that.element = element;
       that.parents = ['trigger', 'wrap', 'content'];
@@ -13,8 +14,10 @@
       that.attributes = ['open', 'indicatorParent', 'trigger', 'content'];
       that.defaults = {
         debug:           false,
+        // selector
         trigger:         '.trigger',
         content:         '.content',
+        // config
         eventSuffix:     '.' + pluginName + '-plugin',
         $trigger:        $(),
         $content:        $(),
@@ -33,6 +36,9 @@
         },
         activeToggle:    false
       };
+      // config
+      // elements
+      // init
       that._init(options);
     },
     $win = $(window);
@@ -42,9 +48,7 @@
     // grouped loggin
     _toggleLogging(toggle, suffix = '', ...args) {
       /* eslint-disable no-console */
-      var s = this.settings;
-
-      if (s.debug) {
+      if (this.settings.debug) {
         if (toggle) {
           console.group([pluginName, suffix].join(' '), args);
         }
@@ -74,17 +78,14 @@
     _checkViewport() {
       this._log('_checkViewport');
 
-      var that = this,
+      const that = this,
         settings = that.settings,
-        off,
-        delta;
+        off = that.$wrap.offset().top,
+        delta = settings.calcDelta();
 
       if (!settings.open) {
         return false;
       }
-
-      off = that.$wrap.offset().top;
-      delta = settings.calcDelta();
 
       if ($win.scrollTop() > off) {
         $win.scrollTop(off - delta);
@@ -97,13 +98,13 @@
 
     // set trigger listener
     _setListener() {
-      var that = this,
-        s = that.settings;
+      const that = this,
+        settings = that.settings;
 
       that._log('_setListener');
 
-      s.$trigger.on('click' + s.eventSuffix, function (e) {
-        that._toggleLogging(true, '<trigger-click>', e);
+      settings.$trigger.on('click' + settings.eventSuffix, function (e) {
+        that._toggleLogging(true, '<$trigger:click>', e);
         e.preventDefault();
         that.toggle();
         that._checkViewport();
@@ -116,9 +117,9 @@
     _unsetListener() {
       this._log('_unsetListener');
 
-      var s = this.settings;
+      const settings = this.settings;
 
-      s.$trigger.off('click' + s.eventSuffix);
+      settings.$trigger.off('click' + settings.eventSuffix);
     },
 
 
@@ -126,14 +127,16 @@
     _checkIndicatorParent() {
       this._log('_checkIndicatorParent');
 
-      var that = this,
+      const that = this,
         s = that.settings;
+      let i,
+        len;
 
       if (!s.indicatorParent) {
         return false;
       }
 
-      for (var i = 0, len = that.parents.length; i < len; i += 1) {
+      for (i = 0, len = that.parents.length; i < len; i += 1) {
         if (that.parents[i] === s.indicatorParent) {
           return true;
         }
@@ -147,23 +150,23 @@
     _createIndicator() {
       this._log('_createIndicator');
 
-      var that = this,
-        s = that.settings,
-        $appendTo;
+      const that = this,
+        settings = that.settings;
+      let $appendTo;
 
       if (!that._checkIndicatorParent()) {
         return false;
       }
 
-      s.$indicator = $('<span></span>')
-        .addClass(s.classPrefix + s.indicatorClass);
+      settings.$indicator = $('<span></span>')
+        .addClass(settings.classPrefix + settings.indicatorClass);
 
-      switch (s.indicatorParent) {
+      switch (settings.indicatorParent) {
         case 'trigger':
-          $appendTo = s.$trigger;
+          $appendTo = settings.$trigger;
           break;
         case 'content':
-          $appendTo = s.$content;
+          $appendTo = settings.$content;
           break;
         // case 'parent':
         default:
@@ -171,7 +174,7 @@
           break;
       }
 
-      s.$indicator.appendTo($appendTo);
+      settings.$indicator.appendTo($appendTo);
 
       return true;
     },
@@ -181,23 +184,23 @@
     _getJqueryElements () {
       this._log('_getJqueryElements');
 
-      var that = this,
-        s = that.settings,
+      const that = this,
+        settings = that.settings,
         $wrap = that.$wrap;
 
       // make sure we're working with jquery objects
-      if (typeof s.trigger === 'object') {
-        s.$trigger = s.trigger;
+      if (typeof settings.trigger === 'object') {
+        settings.$trigger = settings.trigger;
       }
       else {
-        s.$trigger = $wrap.find(s.trigger);
+        settings.$trigger = $wrap.find(settings.trigger);
       }
 
-      if (typeof s.content === 'object') {
-        s.$content = s.content;
+      if (typeof settings.content === 'object') {
+        settings.$content = settings.content;
       }
       else {
-        s.$content = $wrap.find(s.content);
+        settings.$content = $wrap.find(settings.content);
       }
     },
 
@@ -206,16 +209,16 @@
     _create() {
       this._log('_create');
 
-      var that = this,
-        s = that.settings,
+      const that = this,
+        settings = that.settings,
         $wrap = that.$wrap;
 
       $wrap.trigger('before-create', [that.settings.open]);
 
       that._getJqueryElements();
 
-      s.$trigger.addClass(s.classPrefix + s.triggerClass);
-      s.$content.addClass(s.classPrefix + s.contentClass);
+      settings.$trigger.addClass(settings.classPrefix + settings.triggerClass);
+      settings.$content.addClass(settings.classPrefix + settings.contentClass);
 
       that._createIndicator();
       that._setListener();
@@ -227,19 +230,19 @@
     _toggleIndicator(status) {
       this._log('_toggleIndicator', status);
 
-      var that = this,
-        s = that.settings,
-        text = s.closeText;
+      const that = this,
+        settings = that.settings;
+      let text = settings.closeText;
 
       if (status) {
-        text = s.openText;
+        text = settings.openText;
       }
 
-      if (!s.$indicator) {
+      if (!settings.$indicator) {
         return false;
       }
 
-      s.$indicator.text(text)
+      settings.$indicator.text(text)
         .attr('title', text);
 
       return status;
@@ -249,15 +252,16 @@
     //
     _toggleByStatus(status) {
       this._log('_toggleStausClass', status);
-      var that = this,
-        s = that.settings;
 
-      that.$wrap.toggleClass(s.classPrefix + s.openClass, status)
-        .toggleClass(s.classPrefix + s.closeClass, !status);
+      const that = this,
+        settings = that.settings;
+
+      that.$wrap.toggleClass(settings.classPrefix + settings.openClass, status)
+        .toggleClass(settings.classPrefix + settings.closeClass, !status);
       that._toggleIndicator(status);
 
-      if (s.activeToggle) {
-        s.$content.toggle(status);
+      if (settings.activeToggle) {
+        settings.$content.toggle(status);
       }
     },
 
@@ -265,24 +269,25 @@
     // toggle the display and set related data
     toggle(setStatus, doNotEmitEvent) {
       this._log('toggle', setStatus, doNotEmitEvent);
-      var that = this,
-        s = that.settings,
-        status = setStatus;
+
+      const that = this,
+        settings = that.settings;
+      let status = setStatus;
 
       // true = open; false = closed
       if (typeof setStatus !== 'boolean') {
-        status = !s.open;
+        status = !settings.open;
       }
 
       if (!doNotEmitEvent) {
-        that.$wrap.trigger('before-toggle', [s.open, status]);
+        that.$wrap.trigger('before-toggle', [settings.open, status]);
       }
 
       that._toggleByStatus(status);
-      s.open = status;
+      settings.open = status;
 
       if (!doNotEmitEvent) {
-        that.$wrap.trigger('toggle', [s.open]);
+        that.$wrap.trigger('toggle', [settings.open]);
       }
 
       return status;
@@ -291,7 +296,7 @@
 
     // update
     update(status) {
-      var that = this;
+      const that = this;
 
       that._log('update', status);
       that.$wrap.trigger('before-update', [that.settings.open]);
@@ -306,17 +311,18 @@
     _importAttrConfig() {
       this._log('_importAttrConfig');
 
-      var that = this,
-        s = that.settings,
+      const that = this,
+        settings = that.settings,
         data = that.$wrap.data('options');
+      let attr;
 
       if (!data) {
         return false;
       }
 
-      for (const attr of that.attributes) {
+      for (attr of that.attributes) {
         if (Reflect.getOwnPropertyDescriptor(data, attr)) {
-          s[attr] = data[attr];
+          settings[attr] = data[attr];
         }
       }
 
@@ -326,7 +332,7 @@
 
     // (private) where it all begins
     _init(options) {
-      var that = this;
+      const that = this;
 
       that.$wrap = $(that.element);
 
@@ -347,7 +353,7 @@
     destroy() {
       this._log('destroy');
 
-      var that = this,
+      const that = this,
         s = that.settings;
 
       that.$wrap.trigger('before-destroy', [status]);
@@ -374,7 +380,7 @@
   $.fn[pluginName] = function (options, additionaloptions) {
     return this.each(function () {
       // eslint-disable-next-line no-invalid-this
-      var that = this;
+      const that = this;
 
       if (!$.data(that, dataKey)) {
         $.data(that, dataKey, new Plugin(that, options));

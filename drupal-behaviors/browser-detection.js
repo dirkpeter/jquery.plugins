@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 function getInternetExplorerVersion() {
-  var rv = -1,
+  let rv = -1,
     ua,
     re;
 

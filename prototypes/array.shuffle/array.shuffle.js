@@ -4,6 +4,8 @@
 
 if (!Reflect.getOwnPropertyDescriptor(Array.prototype, 'shuffle')) {
   Array.prototype.shuffle = () => {
+    // not an invlalid this
+    // eslint-disable-next-line no-invalid-this
     const that = this;
     let i = that.length,
       p,

@@ -1,12 +1,13 @@
-// eslint-disable strict
+'use strict';
+
 // object fit
 // Modernizr support required
 Drupal.behaviors.__THEME__ObjectFit = {
   attach () {
     if (!Modernizr.objectfit) {
       $('picture').once('object-fit')
-        .each(function () {
-          var $container = $(this),
+        .each((i, el) => {
+          const $container = $(el),
             imgUrl = $container.find('img').prop('src');
 
           if (imgUrl) {

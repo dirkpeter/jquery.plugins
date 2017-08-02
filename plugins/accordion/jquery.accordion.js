@@ -1,39 +1,51 @@
 'use strict';
 
 (function ($) {
-  var pluginName = 'accordion',
+  const pluginName = 'accordion',
     dataKey = 'plugin_' + pluginName,
     // eslint-disable-next-line func-style
     Plugin = function (element, options) {
-      this.element = element;
-      this.attributes = ['current', 'trigger', 'content'];
-      this.defaults = {
+      const that = this;
+
+      that.element = element;
+      that.attributes = ['current', 'trigger', 'content'];
+      that.defaults = {
         debug:             false,
         debugCollapsibles: false,
-        elements:          $(),
-        classPrefix:       'accordion-',
-        eventSuffix:       '.' + pluginName + '-plugin',
-        elementsClass:     'element',
-        trigger:           '.trigger',
+        // selectors
         content:           '.content',
-        triggerClass:      'trigger',
+        trigger:           '.trigger',
+        // classes
+        classPrefix:       'accordion-',
         contentClass:      'content',
-        toggleListener:    true,
+        elementsClass:     'element',
+        triggerClass:      'trigger',
+        // config
+        elements:          $(),
+        eventSuffix:       '.' + pluginName + '-plugin',
         multiple:          false,
+        toggleListener:    true,
         calcDelta() {
           return 0;
         },
         current:           0
       };
-      this._init(options);
+      // config
+      that.current = 0;
+      that.elementCount = undefined;
+      // elements
+      that.$element = undefined;
+      that.$elements = undefined;
+      // init
+      that._init(options);
     };
 
 
   Plugin.prototype = {
-    // grouped loggin
+    // grouped logging
     _toggleLogging(toggle, suffix = '', ...args) {
       /* eslint-disable no-console */
-      var s = this.settings;
+      const s = this.settings;
 
       if (s.debug) {
         if (toggle) {
@@ -66,12 +78,12 @@
     _setCurrent(index, showCurrent, forceCurrent) {
       this._log('_setCurrent', index, showCurrent, forceCurrent);
 
-      var that = this,
-        s = that.settings,
-        elements = s.elementsCache;
+      const that = this,
+        settings = that.settings,
+        elements = settings.elementsCache;
 
       // eslint-disable-next-line no-extra-parens
-      if (parseInt(index, 10) < 0 || (!forceCurrent && s.current === index)) {
+      if (parseInt(index, 10) < 0 || (!forceCurrent && that.current === index)) {
         return false;
       }
 
@@ -80,7 +92,7 @@
         elements[index].toggle(true, true);
       }
 
-      if (s.multiple !== true) {
+      if (settings.multiple !== true) {
         // hide all others
         elements.forEach((element, i) => {
           if (i !== index) {
@@ -89,34 +101,36 @@
         });
       }
 
-      s.current = index;
-      that.$wrap.trigger('set-current', [that.settings.current]);
+      that.current = index;
+      that.$element.trigger('set-current', [that.current]);
 
       return index;
     },
 
 
-    // (private) listen to the collapsibles
+    // (private) listen to the Collapsibles
     _setCollapsibleListener() {
       this._log('_setCollapsibleListener');
 
-      var that = this;
+      const that = this;
 
-      that.$elements.on('toggle' + that.settings.eventSuffix, (e, isOpen) => {
-        that._toggleLogging(true, '<element-toggle>', e, isOpen);
-        if (isOpen) {
-          that.goto($(e.currentTarget).index(), true, false);
-        }
-        that._toggleLogging();
-      });
+      that.$elements
+        .on('toggle' + that.settings.eventSuffix, (e, isOpen) => {
+          that._toggleLogging(true, '<element-toggle>', e, isOpen);
+          if (isOpen) {
+            that.goto($(e.currentTarget).index(), true, false);
+          }
+          that._toggleLogging();
+        });
     },
 
 
-    // (private) cache the elements to have faster access by id, and not have to cast them each time
+    // (private) cache the elements to have faster access by id
+    // and not have to cast them each time
     _cacheElementsById() {
       this._log('_cacheElementsById');
 
-      var that = this,
+      const that = this,
         cache = [];
 
       that.$elements.each(function (i, el) {
@@ -131,21 +145,21 @@
     _create() {
       this._log('_create');
 
-      var that = this,
-        s = that.settings;
+      const that = this,
+        settings = that.settings;
 
       // init the collapsibles
       that.$elements.collapsible({
-        trigger:   s.trigger,
-        content:   s.content,
-        calcDelta: s.calcDelta,
+        trigger:   settings.trigger,
+        content:   settings.content,
+        calcDelta: settings.calcDelta,
         open:      false,
-        debug:     s.debugCollapsibles
+        debug:     settings.debugCollapsibles
       });
       that._cacheElementsById();
-      that.elementCount = s.elementsCache.length;
+      that.elementCount = settings.elementsCache.length;
 
-      if (s.toggleListener) {
+      if (settings.toggleListener) {
         that._setCollapsibleListener();
       }
     },
@@ -155,8 +169,8 @@
     goto(stepnumber, isIndex) {
       this._log('goto', stepnumber, isIndex);
 
-      var that = this,
-        index = stepnumber;
+      const that = this;
+      let index = stepnumber;
 
       if (!isIndex) {
         index = parseInt(stepnumber, 10) - 1;
@@ -178,7 +192,7 @@
     update() {
       this._log('update');
 
-      var that = this;
+      const that = this;
 
       that.goto(that.settings.current, true);
     },
@@ -188,16 +202,16 @@
     _importAttrConfig() {
       this._log('_importAttrConfig');
 
-      var that = this,
+      const that = this,
         s = that.settings,
-        data = that.$wrap.data('options');
+        data = that.$element.data('options');
 
       if (!data) {
         return false;
       }
 
       for (const attr of that.attributes) {
-        if (Reflect.getOwnPropertyDescriptor(data, attr)) {
+        if (data.hasOwnProperty(attr)) {
           s[attr] = data[attr];
         }
       }
@@ -208,20 +222,20 @@
 
     // (private) init
     _init(options) {
-      var that = this;
+      const that = this;
 
-      that.$wrap = $(that.element);
+      that.$element = $(that.element);
 
       that.settings = $.extend(that.defaults, options);
       that._toggleLogging(true);
       that._log('_init', options);
       that._importAttrConfig();
 
-      that.$elements = that.$wrap.find(that.settings.elements);
+      that.$elements = that.$element.find(that.settings.elements);
       that._create();
       that.update();
 
-      that.$wrap.trigger('init', [that.settings.current]);
+      that.$element.trigger('init', [that.settings.current]);
       that._toggleLogging();
     },
 
@@ -246,7 +260,7 @@
   $.fn[pluginName] = function (options, additionaloptions) {
     return this.each(function () {
       // eslint-disable-next-line no-invalid-this
-      var that = this;
+      const that = this;
 
       if (!$.data(that, dataKey)) {
         $.data(that, dataKey, new Plugin(that, options));
