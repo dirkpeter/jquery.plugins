@@ -50,7 +50,7 @@
     "consistent-return": "error",
     "consistent-this": "error",
     "curly": "error",
-    "default-case": "error",
+    "default-case": "off",
     "dot-location": [
       "error",
       "property"
@@ -92,7 +92,7 @@
     "max-lines": "off",
     "max-nested-callbacks": "error",
     "max-params": "error",
-    "max-statements": ["error", 15],
+    "max-statements": ["error", 25],
     "max-statements-per-line": "error",
     "multiline-ternary": "error",
     "new-cap": "error",
@@ -167,7 +167,7 @@
     "no-process-env": "error",
     "no-process-exit": "error",
     "no-proto": "error",
-    "no-prototype-builtins": "error",
+    "no-prototype-builtins": "off",
     "no-restricted-globals": "error",
     "no-restricted-imports": "error",
     "no-restricted-modules": "error",
@@ -201,7 +201,7 @@
     "no-useless-escape": "error",
     "no-useless-rename": "error",
     "no-useless-return": "error",
-    "no-var": "off",
+    "no-var": "error",
     "no-void": "error",
     "no-warning-comments": [
       "error",
@@ -219,7 +219,7 @@
     ],
     "object-property-newline": "error",
     "object-shorthand": "error",
-    "one-var": "off",
+    "one-var": "error",
     "one-var-declaration-per-line": "error",
     "operator-assignment": "error",
     "operator-linebreak": "error",
@@ -256,7 +256,7 @@
       "always"
     ],
     "strict": [
-      "error",
+      "off",
       "global"
     ],
     "symbol-description": "error",
@@ -267,7 +267,7 @@
       "never"
     ],
     "valid-jsdoc": "error",
-    "vars-on-top": "off",
+    "vars-on-top": "error",
     "wrap-iife": "error",
     "wrap-regex": "error",
     "yield-star-spacing": "error",
