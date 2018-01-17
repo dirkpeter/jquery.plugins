@@ -10,8 +10,18 @@
 ## TODOs {#todos}
 - adjust sctipts to use proper es6 (incl linting)
 - check why prototype-scripts are not uglyfied
-- refactor scroll-spy
-- refactor google-map
+- plugins (es6 & linting / refactor / doc & demo)
+  - [x/ / ] demo-plugin
+  - [x/x/-] collapsible
+  - [x/x/-] accordion
+  - [x/ / ] google-map
+  - [x/ / ] mobile-menu
+  - [ / / ] openlayers-map
+  - [x/ / ] scroll-spy
+  - [x/ / ] scroll-to
+  - [x/ / ] yt-player
+- use init from google-map
+- provide unique error-messages
 - write the readme :D
 
 

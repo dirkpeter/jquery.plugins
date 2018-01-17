@@ -1,6 +1,6 @@
 # jquery.collapsible.js
 
-## Basic setup {#basic-setup}
+## Basic setup
 ```` javascript
 $('.is-collapsible').collapsible({
   open: true
@@ -8,7 +8,7 @@ $('.is-collapsible').collapsible({
 ````
 
 
-## Options {#options}
+## Options
 Example:
 ```` javascript
 settings: {
@@ -37,7 +37,7 @@ settings: {
 
 
 
-## (public) Functions {#functions}
+## (public) Functions
 _Note: status `true` equals the collapsible is open._
 
 Example:
@@ -55,7 +55,7 @@ $('.foo').collapsible('toggle'[, false]);
 
 
 
-## Events {#events}
+## Events
 
 | Event | Data | Info |
 |-------|------|------|
@@ -71,5 +71,5 @@ $('.foo').collapsible('toggle'[, false]);
 | `before-destroy` | status (bool) |  |
 
 
-## TODOs {#todos}
+## TODOs
 - update (changes from accordion adjustment) & finish documentation

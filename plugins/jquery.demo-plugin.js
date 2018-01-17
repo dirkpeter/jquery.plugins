@@ -1,11 +1,12 @@
 'use strict';
 
+// eslint-disable-next-line max-statements
 (function ($) {
-  var pluginName = 'testPlugin',
+  const pluginName = 'collapsible',
     dataKey = 'plugin_' + pluginName,
     // eslint-disable-next-line func-style
     Plugin = function (element, options) {
-      var that = this;
+      const that = this;
 
       that.element = element;
       // define the attributes that will be used to override options (defaults)
@@ -20,10 +21,16 @@
   Plugin.prototype = {
     // (private) logging for development
     _log(txt, ...args) {
-      if (this.settings.debug === true) {
-        // eslint-disable-next-line no-console
-        console.log('[' + pluginName + ':' + txt + ']', args);
+      /* eslint-disable no-console */
+      if (this.settings.debug) {
+        if (args.length) {
+          console.log(txt, args);
+        }
+        else {
+          console.log(txt);
+        }
       }
+      /* eslint-enable no-console */
     },
 
 
@@ -31,7 +38,7 @@
     update() {
       this._log('update');
 
-      var that = this;
+      const that = this;
 
       that.$element.trigger('before-update');
 
@@ -43,7 +50,7 @@
     _create() {
       this._log('create');
 
-      var that = this;
+      const that = this;
 
       that.$element.trigger('create');
     },
@@ -54,8 +61,8 @@
     _importAttrConfig() {
       this._log('importAttrConfig');
 
-      var that = this,
-        s = that.settings,
+      const that = this,
+        settings = that.settings,
         data = that.$element.data('options');
 
       if (!data) {
@@ -64,17 +71,17 @@
 
       for (const attr of that.attributes) {
         if (Reflect.getOwnPropertyDescriptor(data, attr)) {
-          s[attr] = data[attr];
+          settings[attr] = data[attr];
         }
       }
 
-      return s;
+      return settings;
     },
 
 
     // (private) where the fun begins
     _init(options) {
-      var that = this;
+      const that = this;
 
       that.$element = $(that.element);
 
@@ -93,7 +100,7 @@
   $.fn[pluginName] = function (options, additionaloptions) {
     return this.each(function () {
       // eslint-disable-next-line no-invalid-this
-      var that = this;
+      const that = this;
 
       if (!$.data(that, dataKey)) {
         $.data(that, dataKey, new Plugin(that, options));

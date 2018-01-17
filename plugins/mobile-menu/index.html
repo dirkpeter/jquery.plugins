@@ -1,0 +1,112 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>jquery.collapsible.js</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script src="../../lib/modernizr.custom.js"></script>
+
+  <style>
+    body {
+      box-sizing: border-box;
+      max-width: 300px;
+      margin: 2em auto;
+    }
+
+    .collapsible {
+      border: 1px solid #ccc;
+    }
+
+    .collapsible h3 {
+      margin: 0;
+    }
+
+    .collapsible .tgr,
+    .collapsible .cnt {
+      padding: 5px;
+    }
+
+    .collapsible .tgr {
+      display: block;
+      background-color: #ccc;
+      text-decoration: none;
+      color: #000;
+    }
+
+    .collapsible .cnt > :first-child {
+      margin-top: 0;
+    }
+
+    .collapsible .cnt > :last-child {
+      margin-bottom: 0;
+    }
+
+    .collapsible.collapsible-close .cnt {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+<div class="block-main-navigation">
+  <nav role="navigation" class="main-navigation">
+    <ul class="level-0">
+      <li><a href="#">Home</a></li>
+      <li class="has-children"><a href="#">Products</a>
+        <ul class="level-1">
+          <li class="has-children"><a href="#">Fire Resistance</a>
+            <ul class="level-2">
+              <li><a href="#">Check our Range</a></li>
+              <li><a href="#">Systems</a></li>
+            </ul>
+          </li>
+          <li><a href="#">Specialties</a></li>
+          <li><a href="#">Marine</a></li>
+          <li><a href="#">SageGlass</a></li>
+        </ul>
+      </li>
+      <li class="has-children active"><a href="#">Services</a>
+        <ul class="level-1">
+          <li><a href="#">Overview</a></li>
+          <li><a href="#">Segments</a></li>
+          <li><a href="#">Downloads</a></li>
+        </ul>
+      </li>
+      <li class="has-children"><a href="#">Company</a>
+        <ul class="level-1">
+          <li><a href="#">About us</a></li>
+          <li><a href="#">Sustainability</a></li>
+        </ul>
+      </li>
+      <li class="has-children"><a href="#">Contact</a>
+        <ul class="level-1">
+          <li><a href="#">Offices</a></li>
+          <li><a href="#">Get in Touch</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<script src="../../lib/jquery/dist/jquery.min.js"></script>
+<script src="jquery.mobile-menu.js"></script>
+
+<!-- custom js -->
+<script language="JavaScript">
+  (function ($) {
+    $(function () {
+      const $c = $('.collapsible');
+
+      // init
+      $('.main-navigation > ul').mobileMenu({
+        debug: true,
+        collapsible: false
+      });
+    });
+  }(jQuery));
+</script>
+</body>
+</html>

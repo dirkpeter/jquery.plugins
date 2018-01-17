@@ -130,12 +130,6 @@
 
 
     //
-    update() {
-      this._log('update');
-    },
-
-
-    //
     _setListener() {
       this._log('_setListener');
 
@@ -390,12 +384,10 @@
 
     // (private) where the fun begins
     _init(options) {
-      const that = this;
+      const that = this,
+        settings = $.extend(that.defaults, options);
 
       that.$element = $(that.element);
-
-      const settings = $.extend(that.defaults, options);
-
       that.settings = settings;
 
       that._log('_init', options);
@@ -406,7 +398,6 @@
           .done(() => {
             that._create();
             that._setListener();
-            that.update();
 
             that.$element.trigger('init', options);
           });

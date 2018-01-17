@@ -2,7 +2,7 @@
 
 'use strict';
 
-if (!Reflect.getOwnPropertyDescriptor(Array.prototype, 'shuffle')) {
+if (!Array.prototype.hasOwnProperty('shuffle')) {
   Array.prototype.shuffle = () => {
     // not an invlalid this
     // eslint-disable-next-line no-invalid-this

@@ -1,6 +1,3 @@
-
-
-
 ;(function ($, ol, undefined) {
   'use strict';
 
@@ -35,20 +32,20 @@
       this.show();
     }
   };
-/*
-  var jumpToCoord = function jumpToCoord(coords, zoom) {
-    if (typeof(zoom) === 'undefined') {
-      zoom = 17;
-    }
+  /*
+    var jumpToCoord = function jumpToCoord(coords, zoom) {
+      if (typeof(zoom) === 'undefined') {
+        zoom = 17;
+      }
 
-    var view = map.getView();
-    var point = new ol.geom.Point(coords);
-    var size = map.getSize();
+      var view = map.getView();
+      var point = new ol.geom.Point(coords);
+      var size = map.getSize();
 
-    view.fit(point, size);
-    view.setZoom(zoom);
-  };
-*/
+      view.fit(point, size);
+      view.setZoom(zoom);
+    };
+  */
   var jumpToJena = function jumpToJena() {
     var view = map.getView();
     view.setCenter([683109.119003381, 5645615.72126983]);
@@ -130,14 +127,14 @@
       jumpToJena();
     }
   };
-/*
-  var jumpToFeature = function jumpToFeature(poiId) {
-    var poiData = $('#poiData' + poiId);
-    poiData.attr('data-visible', true);
-    updateViewLayer();
-    jumpToCoord([poiData.attr('data-lon'), poiData.attr('data-lat')]);
-  };
-*/
+  /*
+    var jumpToFeature = function jumpToFeature(poiId) {
+      var poiData = $('#poiData' + poiId);
+      poiData.attr('data-visible', true);
+      updateViewLayer();
+      jumpToCoord([poiData.attr('data-lon'), poiData.attr('data-lat')]);
+    };
+  */
   var poiPopupClose = function poiPopupClose(poiId) {
     var overlayPopup = map.getOverlayById('overlayPopup' + poiId);
     overlayPopup.hide();

@@ -25,7 +25,6 @@
 |----------|-----------|--------|------|
 | `goto` | 
 | `update` |
-| `destroy` |
 | `getCurrent` |
 
 
@@ -39,5 +38,5 @@
 
 
 ## TODOs {#todos}
-- proper dcumentation
+- proper documentation
 - add destroy function

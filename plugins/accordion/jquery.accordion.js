@@ -240,13 +240,6 @@
     },
 
 
-    // destroy
-    destroy () {
-      this._log('destroy');
-      // @todo
-    },
-
-
     //
     getCurrent () {
       this._log('getCurrent');

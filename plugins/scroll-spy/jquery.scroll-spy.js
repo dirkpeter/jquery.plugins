@@ -1,246 +1,284 @@
-;(function ($, undefined) {
-  'use strict';
+'use strict';
 
-  var pluginName = 'scrollSpy',
+// eslint-disable-next-line max-statements
+(function ($) {
+  const pluginName = 'scrollSpy',
     dataKey = 'plugin_' + pluginName,
+
+    // eslint-disable-next-line func-style
     Plugin = function (element, options) {
-      this.element = element;
-      this.attributes = ['offset', 'sections'];
-      this.timer = undefined;
-      this.winWidth = undefined;
-      this.winHeight = undefined;
-      this.defaults = {
+      const that = this;
+
+      that.element = element;
+      that.attributes = ['offset', 'sections'];
+      that.defaults = {
         debug:                 false,
-        delta:                 0,
+        // selector
+        sectionsSelector:      ['section', '[data-nav-item]'],
+        titleSelector:         'h1, h2',
         navID:                 pluginName.toLowerCase(),
+        navAttach:             'body',
+        // config
         baseClass:             pluginName.toLowerCase(),
-        dataNavAttr:           'nav',
-        itemDataAttr:          'nav-item',
-        navSectionClassPrefix: 'nav-section--',
         currentClass:          'current',
-        selectors:             ['section', '[data-nav-item]'],
-        $parent:               'body',
-        timerDelay:            100,
-        timer:                 undefined,
-        scrollDuration:        500,
+        delta:                 0,
+        dataNavAttr:           'nav',
+        eventSuffix:           '.' + pluginName + '-plugin',
         hideOnMobile:          true,
+        itemDataAttr:          'nav-item',
         mobileMaxWidth:        990,
-        sections:              []
+        navSectionClassPrefix: 'nav-section--',
+        scrollDuration:        500,
+        timer:                 undefined,
+        timerDelay:            100
       };
-      this.init(options);
-    };
+      that.timer = undefined;
+      // config
+      that.winWidth = undefined;
+      that.winHeight = undefined;
+      // elements
+      that.$element = undefined;
+      that.$attach = undefined;
+      that.$sections = $();
+      that.$list = undefined;
+      // init
+      that._init(options);
+    },
+    $win = $(window);
 
 
   Plugin.prototype = {
-    //
-    _log: function (txt) {
+    // (private) logging for development
+    _log(txt, ...args) {
       if (this.settings.debug === true) {
-        console.log('[' + pluginName + ']', txt);
+        // eslint-disable-next-line no-console
+        console.log('[' + pluginName + ':' + txt + ']', args);
       }
     },
 
 
     //
-    _setCurrent: function () {
+    _setCurrent() {
       this._log('_setCurrent');
 
-      var self = this,
-        s = self.settings,
-        top = Math.round($(window).scrollTop() - self.winHeight / 100 * 50);
+      const that = this,
+        s = that.settings,
+        top = Math.round($(window).scrollTop() - (that.winHeight / 100 * 50));
 
-      self.$items.removeClass(s.currentClass);
+      that.$items.removeClass(s.currentClass);
 
-      for (let section of s.sections) {
-        if (top < section.offset) {
-          section.$nav.addClass(s.currentClass);
-          return false;
+      that.$sections.each((i, el) => {
+        const $section = $(el);
+
+        if (top < $section.offset) {
+          $section.$nav.addClass(s.currentClass);
         }
-      }
+      });
+
+      return true;
     },
 
 
     //
-    update: function () {
+    update() {
       this._log('update');
 
-      var self = this,
-        s = self.settings,
-        $win = $(window);
+      const that = this,
+        settings = that.settings;
 
-      self.winHeight = Math.ceil($win.height());
-      self.winWidth = Math.floor($win.width());
+      that.winHeight = Math.ceil($win.height());
+      that.winWidth = Math.floor($win.width());
 
       //
-      for (let section of s.sections) {
+      for (const section of settings.sections) {
         section.offset = Math.floor(section.$el.offset().top);
       }
 
-      self.$nav.toggle(s.hideOnMobile && self.winWidth > s.mobileMaxWidth);
+      that.$nav.toggle(settings.hideOnMobile && that.winWidth > settings.mobileMaxWidth);
 
-      self._setCurrent();
-      self.$element.trigger('update');
+      that._setCurrent();
+      that.$element.trigger('update');
     },
 
 
     //
-    _collectSections: function () {
+    _collectSections() {
       this._log('_collectSections');
 
-      var self = this,
-        s = self.settings,
-        sections = [];
+      const that = this,
+        settings = that.settings;
+      let $sections = $();
 
-      $(s.selectors.join(', ')).each(function () {
-        var $section = $(this),
-          data = {
-            $el:   $section,
-            title: undefined,
-            $nav:  undefined
-          },
-          dataTitle = $section.data(s.itemDataAttr);
+      $(settings.sectionsSelector.join(', '))
+        .each((i, el) => {
+          const $section = $(el),
+            data = {
+              $el:   $section,
+              title: undefined,
+              $nav:  undefined
+            },
+            dataTitle = $section.data(settings.itemDataAttr);
 
-        if (dataTitle) {
-          data.title = dataTitle;
-        }
-        else {
-          data.title = $section.find('.titlebar h3').text();
-        }
-
-        if (data.title !== undefined && dataTitle !== false) {
-          $section.addClass(s.navSectionClassPrefix + data.title.toLowerCase().replace(' ', '-'));
-
-          if (data.title) {
-            sections.push(data);
+          if (dataTitle) {
+            data.title = dataTitle;
           }
-        }
-      });
+          else {
+            data.title = $section.find(settings.titleSelector).text();
+          }
 
-      s.sections = sections;
+          if (data.title !== undefined && dataTitle !== false) {
+            $section.addClass(settings.navSectionClassPrefix + data.title.toLowerCase().replace(' ', '-'));
+
+            if (data.title) {
+              $section.data(data);
+              $sections = $sections.add($section);
+            }
+          }
+        });
+
+      that.$sections = $sections;
     },
 
 
     //
-    _scrollToSection: function (section) {
+    _scrollToSection(section) {
       this._log('_scrollToSection');
 
-      var s = this.settings,
+      const settings = this.settings,
         off = Math.floor(section.$el.offset().top),
-        top = off - s.delta - parseInt(section.$el.css('margin-top'), 10);
+        top = off - settings.delta - parseInt(section.$el.css('margin-top'), 10);
 
       section.offset = off;
 
-      $('html, body').animate({scrollTop: top}, s.scrollDuration, 'swing');
+      $('html, body').animate({scrollTop: top}, settings.scrollDuration, 'swing');
     },
 
 
     //
-    _setListener: function () {
+    _setListener() {
       this._log('_setListener');
 
-      var self = this,
-        s = self.settings,
-        $win = $(window);
+      const that = this,
+        settings = that.settings;
 
       // nav-click
-      self.$items.on('click.' + pluginName, function (e) {
+      that.$items.on('click.' + pluginName, (e) => {
         e.preventDefault();
-        self._scrollToSection($(this).data(s.itemDataAttr));
+        that._scrollToSection($(e.currentTarget).data(settings.itemDataAttr));
       });
 
       // set current item
-      $win.on('scroll.' + pluginName, function () {
-        if (!s.hideOnMobile || self.winWidth > s.mobileMaxWidth) {
-          self._setCurrent();
+      $win.on('scroll.' + pluginName, () => {
+        if (!settings.hideOnMobile || that.winWidth > settings.mobileMaxWidth) {
+          that._setCurrent();
         }
       });
 
       // trigger a recalc of the section-offsets
-      $win.on('resize.' + pluginName, function () {
-        clearTimeout(self.timer);
-        self.timer = setTimeout(function () {
-          self.update();
-        }, s.timerDelay);
+      $win.on('resize.' + pluginName, () => {
+        clearTimeout(that.timer);
+        that.timer = setTimeout(that.update, settings.timerDelay);
       });
     },
 
 
     //
-    _createMarkup: function () {
+    _createMarkup() {
       this._log('_createMarkup');
 
-      var self = this,
-        s = self.settings;
+      const that = this,
+        settings = that.settings;
+      let $items = $();
 
       // nav
-      self.$nav = $('<nav>', {
-        id:    s.navID,
-        class: s.baseClass + '--wrap'
+      that.$nav = $('<nav>', {
+        id:    settings.navID,
+        class: settings.baseClass + '--wrap'
       });
 
       // ul
-      self.$list = $('<ul class="' + s.baseClass + '--list' + '" />')
-        .appendTo(self.$nav);
+      that.$list = $('<ul class="' + settings.baseClass + '--list" />')
+        .appendTo(that.$nav);
 
       // items
-      self.$items = $();
-      for (let section of s.sections) {
-        section.$nav = $('<li class="' + s.baseClass + '--list-item"><span>' + section.title + '</span></li>')
-          .data(s.itemDataAttr, section)
-          .appendTo(self.$list);
-        self.$items = self.$items.add(section.$nav);
-      }
+      that.$sections.each((i, el) => {
+        const $section = $(el),
+          data = $section.data(),
+          $item = $('<li class="' + settings.baseClass + '--list-item"><span>' + data.title + '</span></li>')
+          .data(settings.itemDataAttr, $section)
+          .appendTo(that.$list);
+
+        $section.data('$nav', $item);
+        $items = $items.add($item);
+      });
 
       // attach to dom
-      self.$nav.appendTo($(s.$parent));
+      that.$nav.appendTo(that.$attach);
+
+      that.$items = $items;
     },
 
 
     //
-    create: function () {
+    create() {
       this._log('create');
 
-      var self = this;
-      self._collectSections();
-      self._createMarkup();
-      self._setListener();
+      const that = this;
 
-      self.$element.trigger('create');
+      that.$attach = $(that.settings.navAttach);
+
+      that._collectSections();
+      that._createMarkup();
+      that._setListener();
+
+      that.$element.trigger('create');
     },
 
 
     // use settings passed to the element using the "data-" attribute
-    _importAttrConfig: function () {
-      var self = this,
-        s = self.settings,
-        data = self.$element.data('options'),
-        attr;
+    _importAttrConfig() {
+      this._log('_importAttrConfig');
 
-      if (!data) {
-        return false;
-      }
+      const that = this,
+        s = that.settings,
+        data = that.$element.data();
 
-      for (var i = 0, len = self.attributes.length; i < len; i += 1) {
-        attr = self.attributes[i];
+      for (const attr of that.attributes) {
         if (data.hasOwnProperty(attr)) {
-          s[attr] = data[attr];
+          // handle exceptions
+          switch (attr) {
+            case 'center':
+              s[attr] = {
+                lat: data[attr][0],
+                lng: data[attr][1]
+              };
+              break;
+
+            default:
+              s[attr] = data[attr];
+              break;
+          }
         }
       }
+
+      return that.settings;
     },
 
 
-    //
-    init: function (options) {
-      var self = this;
+    // (private) where the fun begins
+    _init(options) {
+      const that = this,
+        settings = $.extend(that.defaults, options);
 
-      self.$element = $(self.element);
+      that.$element = $(that.element);
 
-      self.settings = $.extend(self.defaults, options);
-      self._importAttrConfig();
+      that.settings = settings;
+      that._importAttrConfig();
 
-      self.create();
-      self.update();
+      that.create();
+      that.update();
 
-      self.$element.trigger('init');
+      that.$element.trigger('init');
     }
   };
 
@@ -248,15 +286,18 @@
   // Plugin wrapper
   $.fn[pluginName] = function (options, additionaloptions) {
     return this.each(function () {
-      if (!$.data(this, dataKey)) {
-        $.data(this, dataKey, new Plugin(this, options));
+      // eslint-disable-next-line no-invalid-this
+      const that = this;
+
+      if (!$.data(that, dataKey)) {
+        $.data(that, dataKey, new Plugin(that, options));
       }
       else if (Plugin.prototype[options]) {
         // prevent execution of private functions
         if (typeof options === 'string' && options.substr(0, 1) !== '_') {
-          $.data(this, dataKey)[options](additionaloptions);
+          $.data(that, dataKey)[options](additionaloptions);
         }
       }
     });
   };
-})(jQuery);
+}(jQuery));

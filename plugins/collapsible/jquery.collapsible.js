@@ -19,12 +19,10 @@
         content:         '.content',
         // config
         eventSuffix:     '.' + pluginName + '-plugin',
-        $trigger:        $(),
-        $content:        $(),
+        classPrefix:     'collapsible-',
         triggerClass:    'trigger',
         contentClass:    'content',
         open:            false,
-        classPrefix:     'collapsible-',
         openClass:       'open',
         closeClass:      'close',
         indicatorClass:  'indicator',
@@ -38,6 +36,10 @@
       };
       // config
       // elements
+      that.$element = undefined;
+      that.$indicator = undefined;
+      that.$content = undefined;
+      that.$trigger = undefined;
       // init
       that._init(options);
     },
@@ -58,6 +60,7 @@
       }
       /* eslint-enable no-console */
     },
+
 
     // (private) logging for development
     _log(txt, ...args) {
@@ -80,7 +83,7 @@
 
       const that = this,
         settings = that.settings,
-        off = that.$wrap.offset().top,
+        off = that.$element.offset().top,
         delta = settings.calcDelta();
 
       if (!settings.open) {
@@ -89,7 +92,7 @@
 
       if ($win.scrollTop() > off) {
         $win.scrollTop(off - delta);
-        that.$wrap.trigger('adjust-viewport', [settings.open]);
+        that.$element.trigger('adjust-viewport', [settings.open]);
       }
 
       return true;
@@ -103,7 +106,7 @@
 
       that._log('_setListener');
 
-      settings.$trigger.on('click' + settings.eventSuffix, function (e) {
+      that.$trigger.on('click' + settings.eventSuffix, function (e) {
         that._toggleLogging(true, '<$trigger:click>', e);
         e.preventDefault();
         that.toggle();
@@ -117,9 +120,9 @@
     _unsetListener() {
       this._log('_unsetListener');
 
-      const settings = this.settings;
+      const that = this;
 
-      settings.$trigger.off('click' + settings.eventSuffix);
+      that.$trigger.off('click' + that.settings.eventSuffix);
     },
 
 
@@ -158,23 +161,23 @@
         return false;
       }
 
-      settings.$indicator = $('<span></span>')
+      that.$indicator = $('<span></span>')
         .addClass(settings.classPrefix + settings.indicatorClass);
 
       switch (settings.indicatorParent) {
         case 'trigger':
-          $appendTo = settings.$trigger;
+          $appendTo = that.$trigger;
           break;
         case 'content':
-          $appendTo = settings.$content;
+          $appendTo = that.$content;
           break;
         // case 'parent':
         default:
-          $appendTo = that.$wrap;
+          $appendTo = that.$element;
           break;
       }
 
-      settings.$indicator.appendTo($appendTo);
+      that.$indicator.appendTo($appendTo);
 
       return true;
     },
@@ -186,21 +189,21 @@
 
       const that = this,
         settings = that.settings,
-        $wrap = that.$wrap;
+        $element = that.$element;
 
       // make sure we're working with jquery objects
       if (typeof settings.trigger === 'object') {
-        settings.$trigger = settings.trigger;
+        that.$trigger = settings.trigger;
       }
       else {
-        settings.$trigger = $wrap.find(settings.trigger);
+        that.$trigger = $element.find(settings.trigger);
       }
 
       if (typeof settings.content === 'object') {
-        settings.$content = settings.content;
+        that.$content = settings.content;
       }
       else {
-        settings.$content = $wrap.find(settings.content);
+        that.$content = $element.find(settings.content);
       }
     },
 
@@ -211,18 +214,18 @@
 
       const that = this,
         settings = that.settings,
-        $wrap = that.$wrap;
+        $element = that.$element;
 
-      $wrap.trigger('before-create', [that.settings.open]);
+      $element.trigger('before-create', [that.settings.open]);
 
       that._getJqueryElements();
 
-      settings.$trigger.addClass(settings.classPrefix + settings.triggerClass);
-      settings.$content.addClass(settings.classPrefix + settings.contentClass);
+      that.$trigger.addClass(settings.classPrefix + settings.triggerClass);
+      that.$content.addClass(settings.classPrefix + settings.contentClass);
 
       that._createIndicator();
       that._setListener();
-      $wrap.trigger('create', [that.settings.open]);
+      $element.trigger('create', [that.settings.open]);
     },
 
 
@@ -238,11 +241,11 @@
         text = settings.openText;
       }
 
-      if (!settings.$indicator) {
+      if (!that.$indicator) {
         return false;
       }
 
-      settings.$indicator.text(text)
+      that.$indicator.text(text)
         .attr('title', text);
 
       return status;
@@ -256,12 +259,12 @@
       const that = this,
         settings = that.settings;
 
-      that.$wrap.toggleClass(settings.classPrefix + settings.openClass, status)
+      that.$element.toggleClass(settings.classPrefix + settings.openClass, status)
         .toggleClass(settings.classPrefix + settings.closeClass, !status);
       that._toggleIndicator(status);
 
       if (settings.activeToggle) {
-        settings.$content.toggle(status);
+        that.$content.toggle(status);
       }
     },
 
@@ -280,14 +283,14 @@
       }
 
       if (!doNotEmitEvent) {
-        that.$wrap.trigger('before-toggle', [settings.open, status]);
+        that.$element.trigger('before-toggle', [settings.open, status]);
       }
 
       that._toggleByStatus(status);
       settings.open = status;
 
       if (!doNotEmitEvent) {
-        that.$wrap.trigger('toggle', [settings.open]);
+        that.$element.trigger('toggle', [settings.open]);
       }
 
       return status;
@@ -296,12 +299,13 @@
 
     // update
     update(status) {
+      this._log('update', status);
+
       const that = this;
 
-      that._log('update', status);
-      that.$wrap.trigger('before-update', [that.settings.open]);
+      that.$element.trigger('before-update', [that.settings.open]);
       that.toggle(status);
-      that.$wrap.trigger('update', [that.settings.open]);
+      that.$element.trigger('update', [that.settings.open]);
 
       return status;
     },
@@ -313,7 +317,7 @@
 
       const that = this,
         settings = that.settings,
-        data = that.$wrap.data('options');
+        data = that.$element.data('options');
       let attr;
 
       if (!data) {
@@ -321,7 +325,7 @@
       }
 
       for (attr of that.attributes) {
-        if (Reflect.getOwnPropertyDescriptor(data, attr)) {
+        if (data.hasOwnProperty(attr)) {
           settings[attr] = data[attr];
         }
       }
@@ -332,19 +336,20 @@
 
     // (private) where it all begins
     _init(options) {
-      const that = this;
+      const that = this,
+        settings = $.extend(that.defaults, options);
 
-      that.$wrap = $(that.element);
+      that.$element = $(that.element);
+      that.settings = settings;
 
-      that.settings = $.extend(that.defaults, options);
       that._toggleLogging(true);
       that._log('_init', options);
       that._importAttrConfig();
 
       that._create();
-      that.update(that.settings.open);
+      that.update(settings.open);
 
-      that.$wrap.trigger('init', [that.settings.status]);
+      that.$element.trigger('init', [settings.status]);
       that._toggleLogging();
     },
 
@@ -353,17 +358,16 @@
     destroy() {
       this._log('destroy');
 
-      const that = this,
-        s = that.settings;
+      const that = this;
 
-      that.$wrap.trigger('before-destroy', [status]);
-      if (s.$indicator) {
-        s.$indicator.remove();
+      that.$element.trigger('before-destroy', [status]);
+      if (that.$indicator) {
+        that.$indicator.remove();
       }
       // force show
       that.toggle(true);
       that._unsetListener();
-      that.$wrap.trigger('destroy', [status]);
+      that.$element.trigger('destroy', [status]);
     },
 
 
