@@ -1,13 +1,15 @@
 # JS Plugins & Drupal Behaviors
 
-
-## Plugins {#plugins}
-
-
-## Drupal Behaviors {#drupal-behaviors}
+A loose collection of doodads and gadgets.
 
 
-## TODOs {#todos}
+## Plugins
+
+
+## Drupal Behaviors
+
+
+## TODOs
 - adjust sctipts to use proper es6 (incl linting)
 - check why prototype-scripts are not uglyfied
 - plugins (es6 & linting / refactor / doc & demo)
@@ -25,7 +27,7 @@
 - write the readme :D
 
 
-## Changelog {#change-log}
+## Changelog
 - 24.07.2016
     - adjusted eslint config regarding usage of `var` and placement for variable-definitions
     - linted collapsible
