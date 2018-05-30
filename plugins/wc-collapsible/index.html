@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebComponents</title>
+</head>
+<body>
+
+<h1>Vehicula Sollicitudin</h1>
+
+<p>Vestibulum id ligula porta felis euismod semper. Aenean lacinia bibendum nulla sed consectetur. Cum sociis natoque
+  penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam id dolor id nibh ultricies vehicula ut id
+  elit. Maecenas sed diam eget risus varius blandit sit amet non magna. Nullam quis risus eget urna mollis ornare vel eu
+  leo.</p>
+
+<wc-colapsible title="Ipsum Tortor Ornare">
+  <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Duis
+    mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+  <p>Aenean lacinia bibendum nulla sed consectetur. Nullam id dolor id nibh ultricies vehicula ut id elit. Maecenas
+    sed diam eget risus varius
+    blandit sit amet non magna. Donec id elit non mi porta gravida at eget metus. Cras justo odio, dapibus ac
+    facilisis
+    in, egestas eget quam.</p>
+</wc-colapsible>
+
+<p>Sed posuere consectetur est at lobortis. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Donec
+  id elit non mi porta gravida at eget metus. Curabitur blandit tempus porttitor.</p>
+
+<h2>Cras Venenatis Fusce</h2>
+
+<p>Donec ullamcorper nulla non metus auctor fringilla. Aenean eu leo quam. Pellentesque ornare sem lacinia quam
+  venenatis vestibulum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa
+  justo sit amet risus. Nullam id dolor id nibh ultricies vehicula ut id elit. Donec id elit non mi porta gravida at
+  eget metus. Aenean lacinia bibendum nulla sed consectetur.</p>
+
+<wc-colapsible title="Bibendum Pellentesque Commodo">
+  <p>Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes,
+    nascetur ridiculus mus. Aenean lacinia bibendum nulla sed
+    consectetur. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+  <p>Nullam quis risus eget urna mollis ornare vel eu leo. Fusce dapibus, tellus ac cursus commodo, tortor mauris
+    condimentum nibh, ut fermentum massa justo sit amet risus. Cum sociis natoque penatibus et magnis dis parturient
+    montes, nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.</p>
+  <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Integer posuere erat a ante venenatis dapibus
+    posuere velit aliquet. Cras justo odio, dapibus ac facilisis in, egestas eget quam.</p>
+</wc-colapsible>
+
+<p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+
+<template id="wc-colapsible-template">
+  <style>
+    :host {
+      display: block;
+      width: 100%;
+      margin: 2em auto;
+      border: 1px solid #ccc;
+      transition: all .3s .3s ease-in;
+    }
+    :host .trigger {
+      display: block;
+      border-bottom: 1px solid #ccc;
+      padding: .5em;
+      margin-bottom: -1px;
+      position: relative;
+    }
+    :host .trigger::after {
+      transition: transform .3s .3s ease-in-out;
+      content: '\f0d8';
+      font-family: 'Font Awesome 5 Free';
+      position: absolute;
+      right: .5em;
+      top: 50%;
+      transform: translateY(-50%) rotate(-180deg);
+    }
+    :host main {
+      display: block;
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+      transition: all .3s .3s ease-in,
+      opacity .3s 0s ease-in;
+      max-height: 0;
+      padding: 0 .5em;
+      overflow: auto;
+    }
+    :host [open] .trigger::after {
+      transition: transform .3s 0s ease-in-out;
+      transform: translateY(-50%) rotate(0deg);
+    }
+    [open] :host main {
+      opacity: 1;
+      transform: translateY(0px);
+      pointer-events: all;
+      max-height: 10em;
+      padding: .5em;
+      transition: all .3s 0s ease-out,
+      opacity 1s .3s ease-out;
+    }
+  </style>
+
+  <div class="wc-colapsible">
+    <a class="trigger"></a>
+    <main>
+      <slot></slot>
+    </main>
+  </div>
+</template>
+
+<script src="../../lib/jquery/dist/jquery.min.js"></script>
+<script src="wc.collapsible.js" language="JavaScript"></script>
+<link href="style.css" rel="stylesheet" />
+</body>
+</html>

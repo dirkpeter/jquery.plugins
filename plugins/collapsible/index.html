@@ -15,85 +15,146 @@
       max-width: 300px;
       margin: 2em auto;
     }
-
+    hr {
+      margin: 2em;
+    }
     .collapsible {
       border: 1px solid #ccc;
     }
-
     .collapsible h3 {
       margin: 0;
     }
-
     .collapsible .tgr,
     .collapsible .cnt {
       padding: 5px;
     }
-
     .collapsible .tgr {
       display: block;
       background-color: #ccc;
       text-decoration: none;
       color: #000;
     }
-
     .collapsible .cnt > :first-child {
       margin-top: 0;
     }
-
     .collapsible .cnt > :last-child {
       margin-bottom: 0;
     }
-
-    .collapsible.collapsible-close .cnt {
+    .collapsible.not-animated.collapsible-close .cnt {
       display: none;
     }
   </style>
 </head>
 
 <body>
-  <div class="collapsible">
-    <a href="#" title="Toggle content" class="tgr">
-      <h3>Toggle content</h3>
-    </a>
+<script src="../../lib/jquery/dist/jquery.min.js"></script>
+<script src="jquery.collapsible.js"></script>
 
-    <div class="cnt">
-      <p>Donec sed odio dui. Nulla vitae elit libero, a pharetra augue. Curabitur blandit tempus porttitor. Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</p>
-    </div>
+
+<!-- not animated / class based -->
+<div class="collapsible not-animated">
+  <a href="#" title="Toggle content" class="tgr">
+    <h3>Toggle content</h3>
+  </a>
+
+  <div class="cnt">
+    <p>Donec sed odio dui. Nulla vitae elit libero, a pharetra augue. Curabitur blandit tempus porttitor. Praesent
+      commodo cursus magna, vel scelerisque nisl consectetur et.</p>
   </div>
+</div>
 
-  <button id="open">open</button>
-  <button id="close">close</button>
+<button id="open">open</button>
+<button id="close">close</button>
 
-  <script src="../../lib/jquery/dist/jquery.min.js"></script>
-  <script src="jquery.collapsible.js"></script>
+<script language="JavaScript">
+  (function ($) {
+    $(function () {
+      var $c = $('.collapsible.not-animated');
 
-  <!-- custom js -->
-  <script language="JavaScript">
-    (function ($) {
-      $(function () {
-        var $c = $('.collapsible');
-
-        // init
-        $c.collapsible({
-          debug: true,
-          trigger: '.tgr',
-          content: '.cnt'
-        });
-
-        // event-listener example
-        $c.on('toggle', function (e, status) {
-          console.info('toggle', status);
-        });
-
-        $('#open').click(function () {
-          $c.collapsible('toggle', true);
-        });
-
-        $('#close').click(function () {
-          $c.collapsible('toggle', false);
-        });
+      // init
+      $c.collapsible({
+        debug: true,
+        trigger: '.tgr',
+        content: '.cnt',
+        animated: false
       });
-    } (jQuery));
-  </script>
+
+      $('.collapsible.animated')
+          .collapsible({
+            trigger: '.tgr',
+            content: '.cnt',
+            animated: true
+          });
+
+      // event-listener example
+      $c.on('toggle', function (e, status) {
+        console.info('toggle', status);
+      });
+
+      $('#open')
+          .click(function () {
+            $c.collapsible('toggle', true);
+          });
+
+      $('#close')
+          .click(function () {
+            $c.collapsible('toggle', false);
+          });
+    });
+  }(jQuery));
+</script>
+
+
+<hr>
+
+
+<div class="collapsible animated">
+  <a href="#" title="Toggle content" class="tgr">
+    <h3>Show (animated)</h3>
+  </a>
+
+  <div class="cnt">
+    <p>Donec sed odio dui. Nulla vitae elit libero, a pharetra augue. Curabitur blandit tempus porttitor. Praesent
+      commodo cursus magna, vel scelerisque nisl consectetur et.</p>
+  </div>
+</div>
+
+<script language="JavaScript">
+  (function ($) {
+    $(function () {
+      var $c = $('.collapsible.not-animated');
+
+      // init
+      $c.collapsible({
+        debug: true,
+        trigger: '.tgr',
+        content: '.cnt',
+        animated: false
+      });
+
+      $('.collapsible.animated')
+          .collapsible({
+            trigger: '.tgr',
+            content: '.cnt',
+            animated: true
+          });
+
+      // event-listener example
+      $c.on('toggle', function (e, status) {
+        console.info('toggle', status);
+      });
+
+      $('#open')
+          .click(function () {
+            $c.collapsible('toggle', true);
+          });
+
+      $('#close')
+          .click(function () {
+            $c.collapsible('toggle', false);
+          });
+    });
+  }(jQuery));
+</script>
 </body>
 </html>

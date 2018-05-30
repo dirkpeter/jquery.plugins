@@ -102,7 +102,7 @@
       }
 
       that.current = index;
-      that.$element.trigger('set-current', [that.current]);
+      that.$element.trigger('change', [that.current]);
 
       return index;
     },
@@ -195,6 +195,7 @@
       const that = this;
 
       that.goto(that.settings.current, true);
+      that.$element.trigger('update', [that.settings.current]);
     },
 
 

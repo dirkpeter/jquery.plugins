@@ -15,7 +15,9 @@
       max-width: 300px;
       margin: 2em auto;
     }
-
+    hr {
+      margin: 2em;
+    }
     .actions {
       display: flex;
       list-style: none;
@@ -23,53 +25,90 @@
       margin: 1em 0;
       justify-content: center;
     }
-
     .acc {
       list-style: none;
       margin: 0;
       padding: 0;
     }
-
     .collapsible {
       border: 1px solid #ccc;
     }
-
     .collapsible:nth-child(n+2) {
       margin-top: 5px;
     }
-
     .collapsible h3 {
       margin: 0;
     }
-
     .collapsible .toggle,
     .collapsible .body {
       display: block;
       padding: 5px;
     }
-
     .collapsible .body {
       display: block;
       background-color: #ccc;
       text-decoration: none;
       color: #000;
     }
-
     .collapsible .body > :first-child {
       margin-top: 0;
     }
-
     .collapsible .body > :last-child {
       margin-bottom: 0;
     }
-
-    .collapsible.collapsible-close .body {
+    .steps nav,
+    .steps ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .steps nav ul {
+      display:flex;
+    }
+    .steps nav li {
+      flex: 1 0 auto;
+    }
+    .steps nav li:nth-child(n+2) {
+      margin-left: 5px;
+    }
+    .steps nav a {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      border-bottom: 2px solid #ccc;
+      padding: .25em .5em;
+    }
+    .steps nav .current a {
+      border-bottom-color: orange;
+    }
+    .steps .body {
       display: none;
+    }
+    .steps .body.collapsible-open {
+      display: block;
+    }
+    .steps footer {
+      display: flex;
+      margin-top: 1em;
+      padding-top: .5em;
+      border-top: 1px solid #ccc;
+      justify-content: space-between;
+    }
+    .steps footer [disabled] {
+      cursor: not-allowed;
     }
   </style>
 </head>
 
 <body>
+<script src="../../lib/jquery/dist/jquery.min.js"></script>
+<script src="../collapsible/jquery.collapsible.js"></script>
+<script src="jquery.accordion.js"></script>
+
+
+<!--- accordion -->
+<h2>Common accordion</h2>
+
 <ul class="acc">
   <li class="collapsible">
     <a href="#" title="Toggle content" class="toggle">
@@ -78,7 +117,7 @@
 
     <div class="body">
       <p>Donec sed odio dui. Nulla vitae elit libero, a pharetra augue. Curabitur blandit tempus porttitor. Praesent
-         commodo cursus magna, vel scelerisque nisl consectetur et.</p>
+        commodo cursus magna, vel scelerisque nisl consectetur et.</p>
     </div>
   </li>
 
@@ -89,8 +128,8 @@
 
     <div class="body">
       <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris
-         condimentum nibh, ut fermentum massa justo sit amet risus. Maecenas faucibus mollis interdum. Sed posuere
-         consectetur est at lobortis.</p>
+        condimentum nibh, ut fermentum massa justo sit amet risus. Maecenas faucibus mollis interdum. Sed posuere
+        consectetur est at lobortis.</p>
     </div>
   </li>
 
@@ -101,8 +140,8 @@
 
     <div class="body">
       <p>Aenean lacinia bibendum nulla sed consectetur. Fusce dapibus, tellus ac cursus commodo, tortor mauris
-         condimentum nibh, ut fermentum massa justo sit amet risus. Donec ullamcorper nulla non metus auctor
-         fringilla.</p>
+        condimentum nibh, ut fermentum massa justo sit amet risus. Donec ullamcorper nulla non metus auctor
+        fringilla.</p>
     </div>
   </li>
 </ul>
@@ -121,33 +160,118 @@
 
 <input type="text" value="" id="current" />
 
-<script src="../../lib/jquery/dist/jquery.min.js"></script>
-<script src="../collapsible/jquery.collapsible.min.js"></script>
-<script src="jquery.accordion.js"></script>
-
-<!-- custom js -->
 <script language="JavaScript">
   (function ($) {
     $(function () {
       var $acc = $('.acc'),
           $curr = $('#current');
 
-      $acc.accordion({
-        debug:             true,
-        debugCollapsibles: false,
-        trigger:           '.toggle',
-        content:           '.body',
-        elements:          '.collapsible'
-      });
-
-      $('button').on('click', function () {
-        $acc.accordion('goto', $(this).data('child'));
-      });
-
-      $acc.on('set-current', function (e, current) {
+      // show the current index
+      // (listener first to catch init)
+      $acc.on('change', function (e, current) {
         $curr.val(current);
         console.info(e.type, current);
-      })
+      });
+
+      $acc.accordion({
+        debug: true,
+        debugCollapsibles: false,
+        trigger: '.toggle',
+        content: '.body',
+        elements: '.collapsible'
+      });
+
+      $('.actions button')
+          .on('click', function () {
+            $acc.accordion('goto', $(this).data('child'));
+          });
+    });
+  }(jQuery));
+</script>
+
+
+<hr>
+
+
+<!-- step based -->
+<h2>Step-based process</h2>
+<div class="steps">
+  <nav>
+    <ul>
+      <li><a href="#step-1" data-step="1">Step 1</a></li>
+      <li><a href="#step-2" data-step="2">Step 2</a></li>
+      <li><a href="#step-3" data-step="3">Step 3</a></li>
+    </ul>
+  </nav>
+
+  <ul class="container">
+    <div data-step="1" class="body">
+      <h3>Step 1</h3>
+      <p>Etiam porta sem malesuada magna mollis euismod. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cum
+        sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur blandit tempus
+        porttitor. Donec id elit non mi porta gravida at eget metus. Donec ullamcorper nulla non metus auctor
+        fringilla.</p>
+      <footer>
+        <button class="prev" disabled data-step="false">« Prev</button>
+        <button class="next" data-step="2">Next »</button>
+      </footer>
+    </div>
+    <div data-step="2" class="body">
+      <h3>Step 2</h3>
+      <p>Maecenas sed diam eget risus varius blandit sit amet non magna. Integer posuere erat a ante venenatis dapibus
+        posuere velit aliquet. Curabitur blandit tempus porttitor. Aenean lacinia bibendum nulla sed consectetur. Nulla
+        vitae elit libero, a pharetra augue.</p>
+      <footer>
+        <button class="prev" data-step="1">« Prev</button>
+        <button class="next" data-step="3">Next »</button>
+      </footer>
+    </div>
+    <div data-step="3" class="body">
+      <h3>Step 3</h3>
+      <p>Nulla vitae elit libero, a pharetra augue. Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+      <footer>
+        <button class="prev" data-step="2">« Prev</button>
+        <button class="next" disabled data-step="false">Next »</button>
+      </footer>
+    </div>
+  </ul>
+</div>
+
+<script language="JavaScript">
+  (function ($) {
+    $(function () {
+      var $steps = $('.steps');
+      var $container = $steps.find('.container');
+      var $nav = $steps.find('nav');
+      var currentClass = 'current';
+
+      // show current step by event
+      // (listener first to catch init)
+      $container.on('change', (e, index) => {
+        console.log(e.type);
+        $nav
+            .find('li')
+            .removeClass(currentClass);
+
+        $nav
+            .find('a')
+            .filter('[data-step="' + (index + 1) + '"]')
+            .parent()
+            .addClass(currentClass);
+      });
+
+      $container.accordion({
+        trigger: $(),
+        content: '.body',
+        elements: '.body',
+        animated: false
+      });
+
+      // change step by navigation or button
+      $steps.on('click.step', 'nav a, footer button', (e) => {
+        e.preventDefault();
+        $container.accordion('goto', $(e.currentTarget).data('step'));
+      });
     });
   }(jQuery));
 </script>

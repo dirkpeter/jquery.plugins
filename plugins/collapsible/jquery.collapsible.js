@@ -3,47 +3,49 @@
 // eslint-disable-next-line max-statements
 (function ($) {
   const pluginName = 'collapsible',
-    dataKey = 'plugin_' + pluginName,
-    // eslint-disable-next-line func-style
-    Plugin = function (element, options) {
-      const that = this;
+      dataKey = 'plugin_' + pluginName,
+      // eslint-disable-next-line func-style
+      Plugin = function (element, options) {
+        const that = this;
 
-      that.element = element;
-      that.parents = ['trigger', 'wrap', 'content'];
-      // define the attributes that will be used to override options (defaults)
-      that.attributes = ['open', 'indicatorParent', 'trigger', 'content'];
-      that.defaults = {
-        debug:           false,
-        // selector
-        trigger:         '.trigger',
-        content:         '.content',
+        that.element = element;
+        that.parents = ['trigger', 'wrap', 'content'];
+        // define the attributes that will be used to override options
+        // (defaults)
+        that.attributes = ['open', 'indicatorParent', 'trigger', 'content'];
+        that.defaults = {
+          debug: false,
+          // selector
+          trigger: '.trigger',
+          content: '.content',
+          // config
+          eventSuffix: '.' + pluginName + '-plugin',
+          classPrefix: 'collapsible-',
+          triggerClass: 'trigger',
+          contentClass: 'content',
+          open: false,
+          openClass: 'open',
+          closeClass: 'close',
+          indicatorClass: 'indicator',
+          indicatorParent: false,
+          openText: 'Show details',
+          closeText: 'Hide details',
+          animated: true,
+          calcDelta() {
+            return 0;
+          },
+          activeToggle: false
+        };
         // config
-        eventSuffix:     '.' + pluginName + '-plugin',
-        classPrefix:     'collapsible-',
-        triggerClass:    'trigger',
-        contentClass:    'content',
-        open:            false,
-        openClass:       'open',
-        closeClass:      'close',
-        indicatorClass:  'indicator',
-        indicatorParent: false,
-        openText:        'Show details',
-        closeText:       'Hide details',
-        calcDelta() {
-          return 0;
-        },
-        activeToggle:    false
-      };
-      // config
-      // elements
-      that.$element = undefined;
-      that.$indicator = undefined;
-      that.$content = undefined;
-      that.$trigger = undefined;
-      // init
-      that._init(options);
-    },
-    $win = $(window);
+        // elements
+        that.$element = undefined;
+        that.$indicator = undefined;
+        that.$content = undefined;
+        that.$trigger = undefined;
+        // init
+        that._init(options);
+      },
+      $win = $(window);
 
 
   Plugin.prototype = {
@@ -82,9 +84,9 @@
       this._log('_checkViewport');
 
       const that = this,
-        settings = that.settings,
-        off = that.$element.offset().top,
-        delta = settings.calcDelta();
+          settings = that.settings,
+          off = that.$element.offset().top,
+          delta = settings.calcDelta();
 
       if (!settings.open) {
         return false;
@@ -102,7 +104,7 @@
     // set trigger listener
     _setListener() {
       const that = this,
-        settings = that.settings;
+          settings = that.settings;
 
       that._log('_setListener');
 
@@ -131,9 +133,9 @@
       this._log('_checkIndicatorParent');
 
       const that = this,
-        s = that.settings;
+          s = that.settings;
       let i,
-        len;
+          len;
 
       if (!s.indicatorParent) {
         return false;
@@ -154,7 +156,7 @@
       this._log('_createIndicator');
 
       const that = this,
-        settings = that.settings;
+          settings = that.settings;
       let $appendTo;
 
       if (!that._checkIndicatorParent()) {
@@ -162,7 +164,7 @@
       }
 
       that.$indicator = $('<span></span>')
-        .addClass(settings.classPrefix + settings.indicatorClass);
+          .addClass(settings.classPrefix + settings.indicatorClass);
 
       switch (settings.indicatorParent) {
         case 'trigger':
@@ -171,7 +173,7 @@
         case 'content':
           $appendTo = that.$content;
           break;
-        // case 'parent':
+          // case 'parent':
         default:
           $appendTo = that.$element;
           break;
@@ -184,12 +186,12 @@
 
 
     //
-    _getJqueryElements () {
+    _getJqueryElements() {
       this._log('_getJqueryElements');
 
       const that = this,
-        settings = that.settings,
-        $element = that.$element;
+          settings = that.settings,
+          $element = that.$element;
 
       // make sure we're working with jquery objects
       if (typeof settings.trigger === 'object') {
@@ -213,8 +215,8 @@
       this._log('_create');
 
       const that = this,
-        settings = that.settings,
-        $element = that.$element;
+          settings = that.settings,
+          $element = that.$element;
 
       $element.trigger('before-create', [that.settings.open]);
 
@@ -234,7 +236,7 @@
       this._log('_toggleIndicator', status);
 
       const that = this,
-        settings = that.settings;
+          settings = that.settings;
       let text = settings.closeText;
 
       if (status) {
@@ -246,7 +248,7 @@
       }
 
       that.$indicator.text(text)
-        .attr('title', text);
+          .attr('title', text);
 
       return status;
     },
@@ -254,14 +256,23 @@
 
     //
     _toggleByStatus(status) {
-      this._log('_toggleStausClass', status);
+      this._log('_toggleByStatus', status);
 
       const that = this,
-        settings = that.settings;
+          settings = that.settings;
 
       that.$element.toggleClass(settings.classPrefix + settings.openClass, status)
-        .toggleClass(settings.classPrefix + settings.closeClass, !status);
+          .toggleClass(settings.classPrefix + settings.closeClass, !status);
       that._toggleIndicator(status);
+
+      if (settings.animated) {
+        if (status) {
+          that.$content.slideDown();
+        }
+        else {
+          that.$content.slideUp();
+        }
+      }
 
       if (settings.activeToggle) {
         that.$content.toggle(status);
@@ -274,7 +285,7 @@
       this._log('toggle', setStatus, doNotEmitEvent);
 
       const that = this,
-        settings = that.settings;
+          settings = that.settings;
       let status = setStatus;
 
       // true = open; false = closed
@@ -316,8 +327,8 @@
       this._log('_importAttrConfig');
 
       const that = this,
-        settings = that.settings,
-        data = that.$element.data('options');
+          settings = that.settings,
+          data = that.$element.data('options');
       let attr;
 
       if (!data) {
@@ -337,7 +348,7 @@
     // (private) where it all begins
     _init(options) {
       const that = this,
-        settings = $.extend(that.defaults, options);
+          settings = $.extend(that.defaults, options);
 
       that.$element = $(that.element);
       that.settings = settings;

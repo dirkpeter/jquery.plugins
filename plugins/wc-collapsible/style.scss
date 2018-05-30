@@ -1,0 +1,43 @@
+@import "../../lib/components-font-awesome/css/fa-solid.min.css";
+@import "../../lib/components-font-awesome/css/fontawesome.min.css";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  max-width: 400px;
+  margin: 2em auto;
+  padding: 0 1em;
+}
+
+p {
+  &:first-child {
+    margin-top: 0;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+$namespace: 'wc-colapsible';
+
+#{$namespace} {
+  display: block;
+  width: 100%;
+  margin: 2em auto;
+  border: 1px solid #ccc;
+  transition: all .3s .3s ease-in;
+
+  &[open] {
+    box-shadow: 0 3px 10px 0 rgba(#000, .15);
+    transition: all .3s 0s ease-out;
+    transform: translateY(-1px);
+  }
+
+  &[disabled] {
+    background-color: #eee;
+    color: #666;
+  }
+}
