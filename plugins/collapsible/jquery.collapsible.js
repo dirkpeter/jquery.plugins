@@ -247,7 +247,8 @@
         return false;
       }
 
-      that.$indicator.text(text)
+      that.$indicator
+          .text(text)
           .attr('title', text);
 
       return status;

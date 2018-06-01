@@ -10,6 +10,7 @@ $('.is-collapsible').collapsible({
 
 ## Options
 Example:
+
 ```` javascript
 settings: {
   debug: true,
@@ -34,6 +35,7 @@ settings: {
 | `closeText` | string | `'Hide details'` | |
 | `calcDelta` | function | `function () { return 0; }` | |
 | `activeToggle` | bool | `false` | |
+| `animated` | bool | `true` | whether or not the collapsing should be animated by JS |
 
 
 
@@ -72,4 +74,4 @@ $('.foo').collapsible('toggle'[, false]);
 
 
 ## TODOs
-- update (changes from accordion adjustment) & finish documentation
+- finish documentation

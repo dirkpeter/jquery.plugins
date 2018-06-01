@@ -2,43 +2,44 @@
 
 (function ($) {
   const pluginName = 'accordion',
-    dataKey = 'plugin_' + pluginName,
-    // eslint-disable-next-line func-style
-    Plugin = function (element, options) {
-      const that = this;
+      dataKey = 'plugin_' + pluginName,
+      // eslint-disable-next-line func-style
+      Plugin = function (element, options) {
+        const that = this;
 
-      that.element = element;
-      that.attributes = ['current', 'trigger', 'content'];
-      that.defaults = {
-        debug:             false,
-        debugCollapsibles: false,
-        // selectors
-        content:           '.content',
-        trigger:           '.trigger',
-        // classes
-        classPrefix:       'accordion-',
-        contentClass:      'content',
-        elementsClass:     'element',
-        triggerClass:      'trigger',
+        that.element = element;
+        that.attributes = ['current', 'trigger', 'content'];
+        that.defaults = {
+          debug: false,
+          debugCollapsibles: false,
+          // selectors
+          content: '.content',
+          trigger: '.trigger',
+          // classes
+          classPrefix: 'accordion-',
+          contentClass: 'content',
+          elementsClass: 'element',
+          triggerClass: 'trigger',
+          // config
+          elements: $(),
+          eventSuffix: '.' + pluginName + '-plugin',
+          multiple: false,
+          toggleListener: true,
+          animated: true,
+          calcDelta() {
+            return 0;
+          },
+          current: 0
+        };
         // config
-        elements:          $(),
-        eventSuffix:       '.' + pluginName + '-plugin',
-        multiple:          false,
-        toggleListener:    true,
-        calcDelta() {
-          return 0;
-        },
-        current:           0
+        that.current = 0;
+        that.elementCount = undefined;
+        // elements
+        that.$element = undefined;
+        that.$elements = undefined;
+        // init
+        that._init(options);
       };
-      // config
-      that.current = 0;
-      that.elementCount = undefined;
-      // elements
-      that.$element = undefined;
-      that.$elements = undefined;
-      // init
-      that._init(options);
-    };
 
 
   Plugin.prototype = {
@@ -79,8 +80,8 @@
       this._log('_setCurrent', index, showCurrent, forceCurrent);
 
       const that = this,
-        settings = that.settings,
-        elements = settings.elementsCache;
+          settings = that.settings,
+          elements = settings.elementsCache;
 
       // eslint-disable-next-line no-extra-parens
       if (parseInt(index, 10) < 0 || (!forceCurrent && that.current === index)) {
@@ -115,13 +116,14 @@
       const that = this;
 
       that.$elements
-        .on('toggle' + that.settings.eventSuffix, (e, isOpen) => {
-          that._toggleLogging(true, '<element-toggle>', e, isOpen);
-          if (isOpen) {
-            that.goto($(e.currentTarget).index(), true, false);
-          }
-          that._toggleLogging();
-        });
+          .on('toggle' + that.settings.eventSuffix, (e, isOpen) => {
+            that._toggleLogging(true, '<element-toggle>', e, isOpen);
+            if (isOpen) {
+              that.goto($(e.currentTarget)
+                  .index(), true, false);
+            }
+            that._toggleLogging();
+          });
     },
 
 
@@ -131,10 +133,11 @@
       this._log('_cacheElementsById');
 
       const that = this,
-        cache = [];
+          cache = [];
 
       that.$elements.each(function (i, el) {
-        cache.push($(el).data('plugin_collapsible'));
+        cache.push($(el)
+            .data('plugin_collapsible'));
       });
 
       that.settings.elementsCache = cache;
@@ -146,15 +149,16 @@
       this._log('_create');
 
       const that = this,
-        settings = that.settings;
+          settings = that.settings;
 
       // init the collapsibles
       that.$elements.collapsible({
-        trigger:   settings.trigger,
-        content:   settings.content,
+        trigger: settings.trigger,
+        content: settings.content,
         calcDelta: settings.calcDelta,
-        open:      false,
-        debug:     settings.debugCollapsibles
+        open: false,
+        debug: settings.debugCollapsibles,
+        animated: settings.animated
       });
       that._cacheElementsById();
       that.elementCount = settings.elementsCache.length;
@@ -192,10 +196,13 @@
     update() {
       this._log('update');
 
-      const that = this;
+      const that = this,
+          settings = that.settings;
 
-      that.goto(that.settings.current, true);
-      that.$element.trigger('update', [that.settings.current]);
+      that.goto(settings.current, true);
+      that.$element.trigger('update', [settings.current]);
+
+      return settings.current;
     },
 
 
@@ -204,8 +211,8 @@
       this._log('_importAttrConfig');
 
       const that = this,
-        s = that.settings,
-        data = that.$element.data('options');
+          s = that.settings,
+          data = that.$element.data('options');
 
       if (!data) {
         return false;
@@ -242,7 +249,7 @@
 
 
     //
-    getCurrent () {
+    getCurrent() {
       this._log('getCurrent');
 
       return this.settings.current;
