@@ -14,8 +14,8 @@ A loose collection of doodads and gadgets.
 - check why prototype-scripts are not uglyfied
 - plugins (es6 & linting / refactor / doc & demo)
   - [x/ / ] demo-plugin
-  - [x/x/-] collapsible
-  - [x/x/-] accordion
+  - collapsible moved to [dirkpeter/jquery-collapsible](https://github.com/dirkpeter/jquery-collapsible)
+  - accordion moved to [dirkpeter/jquery-accordion](https://github.com/dirkpeter/jquery-accordion)
   - [x/ / ] google-map
   - [x/ / ] mobile-menu
   - [ / / ] openlayers-map
